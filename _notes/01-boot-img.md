@@ -1,3 +1,8 @@
+
+用java做一个最小的操作系统内核2.
+https://blog.csdn.net/tyler_download/article/details/51761750
+
+
 ##  Complie the kernel.asm
 ```
   brew install nasm
