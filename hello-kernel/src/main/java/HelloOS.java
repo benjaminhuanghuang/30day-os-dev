@@ -37,7 +37,7 @@ public class HelloOS {
     }
 
     public HelloOS(String message) {
-        readKernelFromFile("boot.bat");
+        readKernelFromFile("kernel.bat");
 
         int len = 0x168000;
         int curSize = imgByteToWrite.size();
@@ -55,8 +55,8 @@ public class HelloOS {
              * The bin file will be loaded as a floppy disk by the virtual machine
              */
             DataOutputStream out = new DataOutputStream(new FileOutputStream("myos.img"));
-            for (int i = 0; i < imgByteToWriter.size(); i++) {
-                out.writeByte(imgByteToWriter.get(i).byteValue());
+            for (int i = 0; i < imgByteToWrite.size(); i++) {
+                out.writeByte(imgByteToWrite.get(i).byteValue());
             }
         } catch (Exception e) {
             e.printStackTrace();

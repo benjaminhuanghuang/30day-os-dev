@@ -4,7 +4,7 @@
 ```
 compile
 ```
-  nasm boot.asm
+  nasm kernel.asm -o kernel.bat
 ```
 
 ## Install the virtual machine
@@ -16,4 +16,5 @@ Install qemu（quick emulator）
 
 Run the os img
 ```
+  qemu-system-x86_64
 ```

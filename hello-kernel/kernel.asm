@@ -1,7 +1,7 @@
-#
-# https://blog.csdn.net/tyler_download/article/details/51761750
-# nasm boot.asm
-#
+;
+; https://blog.csdn.net/tyler_download/article/details/51761750
+; nasm boot.asm -o kernal.bat
+;
 
 org  0x7c00;
 
@@ -43,6 +43,7 @@ putloop:
     int  0x10
     jmp  putloop
 
+;; infinite loop
 fin:
     HLT
     jmp  fin
