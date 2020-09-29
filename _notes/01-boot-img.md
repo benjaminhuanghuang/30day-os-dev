@@ -1,5 +1,7 @@
 ##  Complie the kernel.asm
 ```
+  brew install nasm
+  
   nasm kernel.asm -o kernel.bat
 ```
 
