@@ -37,7 +37,7 @@ public class HelloOS {
     }
 
     public HelloOS(String message) {
-        readKernelFromFile("kernel.bat");
+        readKernelFromFile("boot.bin");
 
         int len = 0x168000;
         int curSize = imgByteToWrite.size();
