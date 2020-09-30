@@ -125,4 +125,4 @@ marker:
     DB    0xf0, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00
     RESB  4600      ; reserve bytes
     DB    0xf0, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00
-    RESB  1469432   ; reserve bytes
+    RESB  1469432   ; reserve bytes     ; fill the rest part of the floppy disk 1474560(= 1440 * 1024)
