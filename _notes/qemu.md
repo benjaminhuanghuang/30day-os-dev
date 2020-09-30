@@ -57,4 +57,9 @@ qemu-system-i386 -hda xxx.img -cdrom xxx.iso -boot d 以xxx.img为文件系统�
 qemu-system-i386 -hda xxx.img 运行xxx.img中的系统
 ```
 
-## Run 
+## Create floppy image
+```
+  qemu-img create -f raw myos.img 1440k
+  
+  qemu-img info myos.img
+```

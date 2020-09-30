@@ -13,7 +13,7 @@ https://blog.csdn.net/ekkie/article/details/51345149
   nasm -f bin boot.asm -o boot.bin -l boot.lst
 ```
 
-## Method 2: Run the boot.bin using qemu
+## Method 1: Run the boot.bin using qemu
 ```
   qemu-system-x86_64 -fda boot.bin -boot a
 ```

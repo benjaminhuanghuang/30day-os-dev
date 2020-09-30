@@ -68,7 +68,7 @@ public class Floppy {
         } else if (sector >= SECTOR_COUNT) {
             this.current_sector = SECTOR_COUNT - 1;
         } else {
-            this.current_sector = sector;
+            this.current_sector = sector - 1;
         }
     }
 
@@ -104,8 +104,8 @@ public class Floppy {
              */
             DataOutputStream out = new DataOutputStream(new FileOutputStream(fileName));
             for (int cylinder = 0; cylinder < CYLINDER_COUNT; cylinder++) {
-                for (int head = 0; head < MAGNETIC_HEAD.MAGNETIC_HEAD_0.ordinal(); head++) {
-                    for (int sector = 0; sector < SECTOR_COUNT; sector++) {
+                for (int head = 0; head <= MAGNETIC_HEAD.MAGNETIC_HEAD_1.ordinal(); head++) {
+                    for (int sector = 1; sector <= SECTOR_COUNT; sector++) {
                         byte[] buf = readFloppy(MAGNETIC_HEAD.values()[head], cylinder, sector);
                         out.write(buf);
                     }

@@ -1,8 +1,7 @@
 ;
 ; https://blog.csdn.net/ekkie/article/details/51345149
 ; 
-; boot.nas   initial program loader
-;
+; boot.nas   create a 1.5M floppy disk image
 ;
 ;
    
