@@ -51,7 +51,7 @@ public class HelloOS {
 
         try {
             /**
-             * Create a bin file has size 1474560 bytes. Write imgContent to it.
+             * Create a bin file has size 1474560(= 1440 * 1024 ) bytes. Write imgContent to it.
              * The bin file will be loaded as a floppy disk by the virtual machine
              */
             DataOutputStream out = new DataOutputStream(new FileOutputStream("myos.img"));
