@@ -38,17 +38,15 @@ public class HelloOS {
 
     public HelloOS(String message) {
         readKernelFromFile("boot.bin");
-
+        // 168000是16进制，换成10进制是1474560，所以文件大小是1474560（1440*1024字节）
         int len = 0x168000;
         int curSize = imgByteToWrite.size();
         for (int l = 0; l < len - curSize; l++) {
             imgByteToWrite.add(0);
         }
-
     }
 
     public void makeFloppy() {
-
         try {
             /**
              * Create a bin file has size 1474560(= 1440 * 1024 ) bytes. Write imgContent to it.
@@ -68,6 +66,4 @@ public class HelloOS {
         HelloOS os = new HelloOS("Hello, this is my first line of os");
         os.makeFloppy();
     }
-
-
 }
