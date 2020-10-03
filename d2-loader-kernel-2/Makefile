@@ -7,4 +7,4 @@ kernel.bin : kernel.asm
 	nasm -f bin kernel.asm -o kernel.bin
 	
 clean:
-	rm *.bin
+	rm *.bin myos.img

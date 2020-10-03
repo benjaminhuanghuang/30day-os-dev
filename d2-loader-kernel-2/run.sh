@@ -5,10 +5,10 @@ rm myos.img
 dd if=/dev/zero of=myos.img bs=512 count=2880
   
 # Wirte loader.bin (add 0x55AA) and kernel.bin to myos.img by using the java app
-dd if=loader.bin of=myos.img count=1 bs=512 conv=nottunc
+dd if=loader.bin of=myos.img count=1 bs=512
 sudo mount -o loop -t vfat ./myos.img /media/floppy1
 sudo cp kernel.bin /media/floppy1/kenel.bin
-sudo unmount /media/floppy1
+sudo umount /media/floppy1
 
 qemu-system-x86_64 -fda myos.img -boot a
 
