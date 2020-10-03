@@ -23,12 +23,14 @@ start:
     DW    0x12        ; 每个磁道扇区数(18)
     DW    2           ; 磁头数
     DD    0           ; 不使用分区
-    DD    0xB40       ; 重写一次磁盘扇区总数(2880扇区)
-    DB    0,0,0x29    ; 意义不明
-    DD    0xffffffff    ; 可能是卷序列号(4bytes)
+    DD    0           ; 重写一次磁盘扇区总数(2880扇区)
+    DB    0           ; INT13 驱动器号
+    DB    0           ; non use
+    DB    0x29        ; 扩展引导标记
+    DD    0x0    ; 可能是卷序列号(4bytes)
     DB    "HELLO-OS   "    ; 磁盘名称(11字节)
     DB    "FAT12   "    ; 格式名称(8字节)
-    
+
 entry:
     MOV		AX, 0			; init register
     MOV		SS, AX
