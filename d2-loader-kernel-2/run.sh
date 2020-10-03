@@ -7,6 +7,7 @@ qemu-img create -f raw myos.img 1440k
 dd if=loader.bin of=myos.img count=1 bs=512 conv=nottunc
 sudo mount -o loop - t vfat ./myos.img /media/floppy1
 cp kernel.bin /media/floppy1/kenel.bin
+sudo unmount /media/floppy1
 
 qemu-system-x86_64 -fda myos.img -boot a
 
