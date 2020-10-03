@@ -1,12 +1,35 @@
 ;
-;  https://gitee.com/paud/30daysOS/blob/master/projects/03_day/harib00b/ipl.nas
+;  https://gitee.com/paud/30daysOS/blob/master/projects/03_day/harib00f/ipl.nas
 ;  
 ;  Load 10 Cylinder(C0 to C9) 10 * 2 * 18 * 512 = 180 kB to memory
 
-org  0x7c00;
+CYLS	EQU		10				; read 10 Cylinder
 
-LOAD_ADDR  EQU  0X8000
-CYLS	   EQU	10		    ; read 10 Cylinders
+ORG    0x7C00     ; 程序加载到内存地址0x7C00后
+
+; 以下的记述用于标准FAT12格式的软盘
+start:
+    JMP   entry
+    DB	  0x90          ; nop
+    DB    "HELLOIPL"    ; 厂商名(8字节)
+    DW    0x200        ; 扇区大小(512字节)
+    DB    1        ; 每簇扇区大小(1扇区)
+    DW    1        ; Boot记录占多少扇区，也就是FAT起始位置
+    DB    2        ; FAT table个数
+    DW    0xE0        ; 根目录文件最大数(224项)
+    DW    0xB40        ; 磁盘扇区总数(2880扇区)
+    DB    0xF0        ; 磁盘种类
+    DW    9            ; FAT长度
+    DW    0x12        ; 每个磁道扇区数(18)
+    DW    2           ; 磁头数
+    DD    0           ; 不使用分区
+    DD    0           ; 重写一次磁盘扇区总数(2880扇区)
+    DB    0           ; INT13 驱动器号
+    DB    0           ; non use
+    DB    0x29        ; 扩展引导标记
+    DD    0x0    ; 可能是卷序列号(4bytes)
+    DB    "HELLO-OS   "    ; 磁盘名称(11字节)
+    DB    "FAT12   "    ; 格式名称(8字节)
 
 entry:
     MOV		AX, 0			; init register
@@ -51,14 +74,15 @@ next:
     ADD		CH,1
     CMP		CH,CYLS
     JB		readloop		; CH < CYLS jump to readloop
-; sleep
 
-fin:
-    HLT						; 
-    JMP		fin				; 
+; Execute kernel
+; kernel.bin is at 0x4200 on disk, 
+; The disk will be load to 0x8000 in memory, So the address is 0x8000+0x4200 = 0xc200
+    MOV		[0x0ff0],CH		; 
+    JMP		0xc200         
 
 error:
-    MOV		SI,msg
+    MOV		SI, msg
 putloop:
     MOV		AL,[SI]
     ADD		SI,1			; SI + 1
@@ -68,15 +92,17 @@ putloop:
     MOV		BX,15			; color
     INT		0x10			; Call BIOS INT 0x10
     JMP		putloop
+
+fin:
+    HLT						; 
+    JMP		fin				; 
+
 msg:
     DB		0x0a, 0x0a		; new line * 2
     DB		"load error"
     DB		0x0a			; new line
     DB		0
 
-    RESB	0x7dfe-$		; fill 0 from current address to 0x7dfe
-
+current:
+    RESB	0x1fe-(current-start)  ; 0x1fe=510, 0x7dfe=0x7c00+0x1fe reserve bytes
     DB		0x55, 0xaa
-
-
-
