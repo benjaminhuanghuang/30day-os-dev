@@ -10,25 +10,25 @@ ORG    0x7C00     ; 程序加载到内存地址0x7C00后
 ; 以下的记述用于标准FAT12格式的软盘
 start:
     JMP   entry
-    DB	  0x90
-    DB    "HELLOIPL"    ; 启动区名称(8字节)
-    DW    512        ; 扇区大小(512字节)
-    DB    1        ; 簇大小(1扇区)
-    DW    1        ; FAT起始位置
-    DB    2        ; FAT个数
-    DW    224        ; 根目录大小(224项)
-    DW    2880        ; 磁盘大小(2880扇区)
-    DB    0xf0        ; 磁盘种类
-    DW    9        ; FAT长度
-    DW    18        ; 每个磁道扇区数
-    DW    2        ; 磁头数
-    DD    0        ; 不使用分区
-    DD    2880        ; 重写一次磁盘大小
+    DB	  0x90          ; nop
+    DB    "HELLOIPL"    ; 厂商名(8字节)
+    DW    0x200        ; 扇区大小(512字节)
+    DB    1        ; 每簇扇区大小(1扇区)
+    DW    1        ; Boot记录占多少扇区，也就是FAT起始位置
+    DB    2        ; FAT table个数
+    DW    0xE0        ; 根目录文件最大数(224项)
+    DW    0xB40        ; 磁盘扇区总数(2880扇区)
+    DB    0xF0        ; 磁盘种类
+    DW    9            ; FAT长度
+    DW    0x12        ; 每个磁道扇区数(18)
+    DW    2           ; 磁头数
+    DD    0           ; 不使用分区
+    DD    0xB40       ; 重写一次磁盘扇区总数(2880扇区)
     DB    0,0,0x29    ; 意义不明
-    DD    0xffffffff    ; 可能是卷标号码
+    DD    0xffffffff    ; 可能是卷序列号(4bytes)
     DB    "HELLO-OS   "    ; 磁盘名称(11字节)
     DB    "FAT12   "    ; 格式名称(8字节)
-    RESB  18        ; 空出18字节
+    RESB  18           ; 空出18字节
 
 entry:
     MOV		AX, 0			; init register

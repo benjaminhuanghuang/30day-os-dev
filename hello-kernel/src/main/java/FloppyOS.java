@@ -43,12 +43,12 @@ public class FloppyOS {
     }
 
     public void makeFloppy() {
-        writeFileToFloppy("kernel.bin", false, 1, 2);
+        writeFileToFloppy("loader.bin", false, 1, 2);
         floppyDisk.makeFloppy("myos.img");
     }
 
     public static void main(String[] args) {
-        FloppyOS op = new FloppyOS("loader.bin");
+        FloppyOS op = new FloppyOS("boot.bin");
         op.makeFloppy();
     }
 }
