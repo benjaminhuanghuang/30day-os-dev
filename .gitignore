@@ -1,5 +1,5 @@
 .DS_Store
-myos.img
+*.img
 *.bat
 *.bin
 *.lst

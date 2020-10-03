@@ -1,5 +1,5 @@
 
-extern voidio_hlt(void);
+extern void io_hlt(void);
 
 void HariMain(void)
 {
