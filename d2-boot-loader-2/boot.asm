@@ -28,8 +28,7 @@ start:
     DD    0xffffffff    ; 可能是卷序列号(4bytes)
     DB    "HELLO-OS   "    ; 磁盘名称(11字节)
     DB    "FAT12   "    ; 格式名称(8字节)
-    RESB  18           ; 空出18字节
-
+    
 entry:
     MOV		AX, 0			; init register
     MOV		SS, AX
