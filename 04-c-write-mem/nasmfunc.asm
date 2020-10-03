@@ -1,5 +1,5 @@
 section .text
-   GLOBAL  io_hlt
+   GLOBAL  io_hlt, _write_mem8
 
 io_hlt:        ; void io_hlt(void);
    HLT
