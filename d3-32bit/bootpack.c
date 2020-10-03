@@ -1,8 +1,5 @@
-int main(void)
+void HariMain(void)
 {
-
-fin:	
-	goto fin;
-
-	return 0;
+fin:
+  goto fin;
 }
