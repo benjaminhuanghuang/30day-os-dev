@@ -103,6 +103,5 @@ msg:
     DB		0
 
 current:
-    RESB	0x1fe-(current-start)    	; 0x1fe = 510 , reserve bytes
-
+    RESB	0x1fe-(current-start)  ; 0x1fe=510, 0x7dfe=0x7c00+0x1fe reserve bytes
     DB		0x55, 0xaa
