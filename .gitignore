@@ -3,3 +3,7 @@
 *.bat
 *.bin
 *.lst
+*.o
+*.sys
+*.hrb
+*.sys
