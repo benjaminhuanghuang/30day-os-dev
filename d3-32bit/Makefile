@@ -1,17 +1,32 @@
-all: boot.bin	loader.bin
+default:
+	make img
+	
+boot.bin : boot.asm 
+	nasm boot.asm -o boot.bin 
 
-boot.bin : boot.asm
-	nasm -f bin boot.asm -o boot.bin
+asmhead.bin : asmhead.asm 
+	nasm asmhead.asm -o asmhead.bin
 
-#
-loader.bin : bootpack.o asmhead.o
-	ld -s -o loader.bin bootpack.o asmhead.o
+bootpack.hrb : bootpack.c har.ld       
+	gcc -march=i486 -m32 -nostdlib -T har.ld bootpack.c -o bootpack.hrb
 
-asmhead.o : asmhead.asm 
-	nasm -f bin asmhead.asm -o asmhead.o 
+haribote.sys : asmhead.bin bootpack.hrb
+	cat asmhead.bin bootpack.hrb > haribote.sys
 
-bootpack.o : bootpack.c 
-	gcc -c -o bootpack.o bootpack.c 
+myos.img : boot.bin haribote.sys
+	mformat -f 1440 -C -B boot.bin -i myos.img ::
+	mcopy haribote.sys -i myos.img ::
 
-clean:
-	rm *.bin myos.img *.o
+img :
+	make -r myos.img
+
+run :
+	make img
+	qemu-system-i386 -fda myos.img  # "-fda" for floppy disk
+		
+debug :
+	make img
+	qemu-system-i386 -fda myos.img -gdb tcp::10000 -S
+
+clean :
+	rm *.lst *.bin *.sys *.img *.hrb *.o
