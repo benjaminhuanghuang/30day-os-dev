@@ -8,7 +8,7 @@ asmhead.bin : asmhead.asm
 	nasm asmhead.asm -o asmhead.bin
 
 bootpack.hrb : bootpack.c har.ld       
-	gcc -march=i486 -m32 -nostdlib -T har.ld bootpack.c -o bootpack.hrb
+	gcc -march=i486 -m32 -nostdlib -T har.ld -fno-pie bootpack.c -o bootpack.hrb
 
 haribote.sys : asmhead.bin bootpack.hrb
 	cat asmhead.bin bootpack.hrb > haribote.sys
