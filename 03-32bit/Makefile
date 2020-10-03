@@ -8,7 +8,7 @@ asmhead.bin : asmhead.asm
 	nasm asmhead.asm -o asmhead.bin
 
 nasmfunc.o : nasmfunc.asm
-  nasm -g -f elf nasmfunc.nas -o nasmfunc.o
+	nasm -g -f elf nasmfunc.asm -o nasmfunc.o
 
 bootpack.hrb : bootpack.c har.ld       
 	gcc -march=i486 -m32 -nostdlib -T har.ld -fno-pie bootpack.c nasmfunc.o -o bootpack.hrb
