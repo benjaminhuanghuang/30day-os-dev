@@ -2,6 +2,7 @@
 ## Print 
 ```
   MOV    SI, msg
+  
 putloop:
   MOV    AL,[SI]
   ADD    SI,1        ; 给SI加1
