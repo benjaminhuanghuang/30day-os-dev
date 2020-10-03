@@ -23,4 +23,4 @@ fin:
   jmp  fin
 
 msg:
-  DB   "This is Hello World from kernel"
+  DB   "This is Hello World from loader"
