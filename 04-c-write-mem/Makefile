@@ -10,7 +10,7 @@ asmhead.bin : asmhead.asm
 nasmfunc.o : nasmfunc.asm
 	nasm -g -f elf nasmfunc.asm -o nasmfunc.o
 
-bootpack.hrb : bootpack.c har.ld       
+bootpack.hrb : bootpack.c har.ld nasmfunc.o  
 	gcc -march=i486 -m32 -nostdlib -T har.ld -fno-pie bootpack.c nasmfunc.o -o bootpack.hrb
 
 haribote.sys : asmhead.bin bootpack.hrb
