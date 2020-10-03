@@ -8,7 +8,6 @@ CYLS	EQU		10				; read 10 Cylinder
 ORG    0x7C00     ; 程序加载到内存地址0x7C00后
 
 ; 以下的记述用于标准FAT12格式的软盘
-start:
     JMP   entry
     DB	  0x90          ; nop
     DB    "HELLOIPL"    ; 厂商名(8字节)
@@ -103,6 +102,5 @@ msg:
     DB		0x0a			; new line
     DB		0
 
-current:
-    RESB	0x1fe-(current-start)  ; 0x1fe=510, 0x7dfe=0x7c00+0x1fe reserve bytes
+    RESB	0x1fe-($-$$)  ; 0x1fe=510, 0x7dfe=0x7c00+0x1fe reserve bytes
     DB		0x55, 0xaa

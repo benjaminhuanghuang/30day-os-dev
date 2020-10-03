@@ -54,87 +54,88 @@ VRAM	EQU		0x0ff8			; 图形缓冲区起始地址
 ;
 ;[INSTRSET "i486p"]				; 
 
-		LGDT	[GDTR0]			; 设置临时GDT
-		MOV		EAX,CR0
-		AND		EAX,0x7fffffff	; 将bit31设置为0（禁止分页）
-		OR		EAX,0x00000001	; 将bit0设置为1（用于过渡到保护模式）
-		MOV		CR0,EAX
-		JMP		pipelineflush
+	LGDT	[GDTR0]			; 设置临时GDT
+	MOV		EAX,CR0
+	AND		EAX,0x7fffffff	; 将bit31设置为0（禁止分页）
+	OR		EAX,0x00000001	; 将bit0设置为1（用于过渡到保护模式）
+	MOV		CR0,EAX
+	JMP		pipelineflush
 
 pipelineflush:
-		MOV		AX,1*8			;  读/写段32bit
-		MOV		DS,AX
-		MOV		ES,AX
-		MOV		FS,AX
-		MOV		GS,AX
-		MOV		SS,AX
+	MOV		AX,1*8			;  读/写段32bit
+	MOV		DS,AX
+	MOV		ES,AX
+	MOV		FS,AX
+	MOV		GS,AX
+	MOV		SS,AX
 
 ; bootpack
-		MOV		ESI,bootpack	;
-		MOV		EDI,BOTPAK		;
-		MOV		ECX,512*1024/4
-		CALL	memcpy
+	MOV		ESI,bootpack	;
+	MOV		EDI,BOTPAK		;
+	MOV		ECX,512*1024/4
+	CALL	memcpy
 
 ; 
 
 ; 
 
-		MOV		ESI,0x7c00		; source
-		MOV		EDI,DSKCAC		; target
-		MOV		ECX,512/4
-		CALL	memcpy
+	MOV		ESI,0x7c00		; source
+	MOV		EDI,DSKCAC		; target
+	MOV		ECX,512/4
+	CALL	memcpy
 
 ;
-		MOV		ESI,DSKCAC0+512	; source
-		MOV		EDI,DSKCAC+512	; target
-		MOV		ECX,0
-		MOV		CL,BYTE [CYLS]
-		IMUL	ECX,512*18*2/4	; 从柱面数转换为字节数/ 4
-		SUB		ECX,512/4		; 仅扣除IPL
-		CALL	memcpy
+	MOV		ESI,DSKCAC0+512	; source
+	MOV		EDI,DSKCAC+512	; target
+	MOV		ECX,0
+	MOV		CL,BYTE [CYLS]
+	IMUL	ECX,512*18*2/4	; 从柱面数转换为字节数/ 4
+	SUB		ECX,512/4		; 仅扣除IPL
+	CALL	memcpy
 
 
 ; bootpack
 
-		MOV		EBX,BOTPAK
-		MOV		ECX,[EBX+16]
-		ADD		ECX,3			; ECX += 3;
-		SHR		ECX,2			; ECX /= 4;
-		JZ		skip			; 
-		MOV		ESI,[EBX+20]	; source
-		ADD		ESI,EBX
-		MOV		EDI,[EBX+12]	; target
-		CALL	memcpy
+	MOV		EBX,BOTPAK
+	MOV		ECX,[EBX+16]
+	ADD		ECX,3			; ECX += 3;
+	SHR		ECX,2			; ECX /= 4;
+	JZ		skip			; 
+	MOV		ESI,[EBX+20]	; source
+	ADD		ESI,EBX
+	MOV		EDI,[EBX+12]	; target
+	CALL	memcpy
 skip:
-		MOV		ESP,[EBX+12]	; スタック初期値
-		JMP		DWORD 2*8:0x0000001b
+	MOV		ESP,[EBX+12]	; スタック初期値
+	JMP		DWORD 2*8:0x0000001b
 
 waitkbdout:
-		IN		 AL,0x64
-		AND		 AL,0x02
-		JNZ		waitkbdout		; 如果AND的结果不为0，jump to waitkbdout
-		RET
+	IN		 AL,0x64
+	AND		 AL,0x02
+	JNZ		waitkbdout		; 如果AND的结果不为0，jump to waitkbdout
+	RET
 
 memcpy:
-		MOV		EAX,[ESI]
-		ADD		ESI,4
-		MOV		[EDI],EAX
-		ADD		EDI,4
-		SUB		ECX,1
-		JNZ		memcpy			; 如果减法的结果不为0，jump to memcpy
-		RET
+	MOV		EAX,[ESI]
+	ADD		ESI,4
+	MOV		[EDI],EAX
+	ADD		EDI,4
+	SUB		ECX,1
+	JNZ		memcpy			; 如果减法的结果不为0，jump to memcpy
+	RET
 
 ; memcpy
-		ALIGNB	16
+	ALIGNB	16
+	
 GDT0:
-		RESB	8				; 
-		DW		0xffff,0x0000,0x9200,0x00cf	; 读/写段32bit
-		DW		0xffff,0x0000,0x9a28,0x0047	; 可执行段32bit（用于bootpack）
+	RESB	8				; 
+	DW		0xffff,0x0000,0x9200,0x00cf	; 读/写段32bit
+	DW		0xffff,0x0000,0x9a28,0x0047	; 可执行段32bit（用于bootpack）
 
-		DW		0
+	DW		0
 GDTR0:
-		DW		8*3-1
-		DD		GDT0
+	DW		8*3-1
+	DD		GDT0
 
-		ALIGNB	16
+	ALIGNB	16
 bootpack:

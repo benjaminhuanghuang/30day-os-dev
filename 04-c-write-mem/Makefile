@@ -25,7 +25,7 @@ img :
 
 run :
 	make img
-	qemu-system-i386 -fda myos.img  # "-fda" for floppy disk
+	qemu-system-i386 -fda myos.img -boot a
 		
 debug :
 	make img
