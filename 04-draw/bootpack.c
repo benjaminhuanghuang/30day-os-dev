@@ -59,6 +59,8 @@ void HariMain(void)
 	init_palette();
 
 	struct BOOTINFO *binfo = (struct BOOTINFO *) 0x0ff0; // those infor were saved by asmhead.asm
+
+	// Font data for charactor A
 	static char font_A[16] = {
 		0x00, 0x18, 0x18, 0x18, 0x18, 0x24, 0x24, 0x24,
 		0x24, 0x7e, 0x42, 0x42, 0x42, 0xe7, 0x00, 0x00
@@ -153,21 +155,22 @@ void init_screen(char *vram, int x, int y)
 	return;
 }
 
-void putfont8(char *vram, int xsize, int x, int y, char c, char *font)
+void putfont8(char *vram, int xsize, int x, int y, char color, char *font)
 {
 	int i;
 	char *p, d /* data */;
+	// 16 rows
 	for (i = 0; i < 16; i++) {
 		p = vram + (y + i) * xsize + x;
-		d = font[i];
-		if ((d & 0x80) != 0) { p[0] = c; }
-		if ((d & 0x40) != 0) { p[1] = c; }
-		if ((d & 0x20) != 0) { p[2] = c; }
-		if ((d & 0x10) != 0) { p[3] = c; }
-		if ((d & 0x08) != 0) { p[4] = c; }
-		if ((d & 0x04) != 0) { p[5] = c; }
-		if ((d & 0x02) != 0) { p[6] = c; }
-		if ((d & 0x01) != 0) { p[7] = c; }
+		d = font[i]; // each row
+		if ((d & 0x80) != 0) { p[0] = color; }
+		if ((d & 0x40) != 0) { p[1] = color; }
+		if ((d & 0x20) != 0) { p[2] = color; }
+		if ((d & 0x10) != 0) { p[3] = color; }
+		if ((d & 0x08) != 0) { p[4] = color; }
+		if ((d & 0x04) != 0) { p[5] = color; }
+		if ((d & 0x02) != 0) { p[6] = color; }
+		if ((d & 0x01) != 0) { p[7] = color; }
 	}
 	return;
 }

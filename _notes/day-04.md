@@ -102,3 +102,5 @@ https://gitee.com/paud/30daysOS/tree/master/projects/04_day/harib01g
 以前显示字符靠调用BIOS函数，在32位模式，不能再依赖BIOS了
 https://gitee.com/paud/30daysOS/blob/master/projects/05_day/harib02d
 
+字符可以用8×16的长方形像素点阵来表示
+要显示一个字符需要16个字节
