@@ -80,3 +80,14 @@ SECTIONS
 gcc 在Mac OS X上无法使用链接描述文件
 Linux上的GNU ld程序接受-T <scriptname>选项，但在Mac OS上，-T是未知命令选项。
 
+
+
+## 256 palette
+VGA 320*200 8 位调色板模式，8位 means 256种颜色，但本质上VGA还是RGB模式，需要3个字节表示一个完整的颜色，
+缺省情况下 0号颜色是 #000000， 15号颜色是#ffffff
+
+https://gitee.com/paud/30daysOS/blob/master/projects/04_day/harib01f/
+
+
+
+
