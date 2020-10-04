@@ -59,18 +59,18 @@ io_out16:	; void io_out16(int port, int data);
    OUT		DX,AX
    RET
 
-_io_out32:	; void io_out32(int port, int data);
+io_out32:	; void io_out32(int port, int data);
    MOV		EDX,[ESP+4]		; port
    MOV		EAX,[ESP+8]		; data
    OUT		DX,EAX
    RET
 
-_io_load_eflags:	; int io_load_eflags(void);
+io_load_eflags:	; int io_load_eflags(void);
    PUSHFD		; PUSH EFLAGS double-word
    POP		EAX
    RET
 
-_io_store_eflags:	; void io_store_eflags(int eflags);
+io_store_eflags:	; void io_store_eflags(int eflags);
    MOV		EAX,[ESP+4]
    PUSH	EAX
    POPFD		; POP EFLAGS

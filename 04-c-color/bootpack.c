@@ -6,6 +6,9 @@ extern int io_load_eflags(void);
 extern void io_store_eflags(int eflags);
 
 
+void init_palette(void);
+void set_palette(int start, int end, unsigned char *rgb);
+
 void HariMain(void)
 {
   // for (int i = 0xa0000; i < 0xaffff; i++)
