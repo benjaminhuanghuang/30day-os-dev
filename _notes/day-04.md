@@ -104,3 +104,20 @@ https://gitee.com/paud/30daysOS/blob/master/projects/05_day/harib02d
 
 字符可以用8×16的长方形像素点阵来表示
 要显示一个字符需要16个字节
+
+增加字体
+https://gitee.com/paud/30daysOS/blob/master/projects/05_day/harib02e
+The font data is a text file contains information of 256 charactors
+Transfer the information to a bin file :
+256 * 16 = 4096 bytes.
+link this bin 
+
+https://vanya.jp.net/os/haribote.html#hrb
+提供了另一个方法，把 txt file 转化成 c文件，直接编译
+
+s X X X _ _ X X X，
+
+（（（（（（（（（0）* 2 +1）* 2 +1）* 2 +1）* 2）* 2）* 2 +1）* 2 +1）* 2 +1
+
+128 + 64 + 32 + 4 + 2 + 1
+以二进制表示，为“ 11100111”
