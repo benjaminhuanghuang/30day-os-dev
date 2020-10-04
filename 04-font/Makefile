@@ -11,7 +11,7 @@ nasmfunc.o : nasmfunc.asm
 	nasm -g -f elf nasmfunc.asm -o nasmfunc.o
 
 bootpack.hrb : bootpack.c font.c har.ld nasmfunc.o  
-	gcc -march=i486 -m32 -nostdlib -T har.ld -fno-pie bootpack.c nasmfunc.o -o bootpack.hrb
+	gcc -march=i486 -m32 -nostdlib -T har.ld -fno-pie bootpack.c font.c nasmfunc.o -o bootpack.hrb
 
 haribote.sys : asmhead.bin bootpack.hrb
 	cat asmhead.bin bootpack.hrb > haribote.sys
