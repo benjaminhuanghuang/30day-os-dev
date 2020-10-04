@@ -98,3 +98,7 @@ https://gitee.com/paud/30daysOS/tree/master/projects/04_day/harib01g
 其他画面模式也基本相同，只是0xa0000这个起始地址和y的系数320有些不同。
 
 
+## Draw text
+以前显示字符靠调用BIOS函数，在32位模式，不能再依赖BIOS了
+https://gitee.com/paud/30daysOS/blob/master/projects/05_day/harib02d
+
