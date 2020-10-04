@@ -7,7 +7,7 @@ f.write('#define X )*2+1\n')
 f.write('#define _ )*2\n')
 f.write('#define s ((((((((0\n')
 f.write('\n')
-f.write('char font[4096] = {\n')
+f.write('char hankaku[4096] = {\n')
 
 i = 1
 for line in open('font.txt', 'r'):
