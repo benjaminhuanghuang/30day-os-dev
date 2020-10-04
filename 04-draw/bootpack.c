@@ -57,11 +57,8 @@ void HariMain(void)
 	init_palette();
 
 	struct BOOTINFO *binfo = (struct BOOTINFO *) 0x0ff0; // those infor were saved by asmhead.asm
-	int xsize = (*binfo).scrnx;
-	int ysize = (*binfo).scrny;
-	char *vram = (*binfo).vram; // 0xa0000
 
-	init_screen(vram, xsize, ysize);
+	init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
 
 	for (;;)
 	{
