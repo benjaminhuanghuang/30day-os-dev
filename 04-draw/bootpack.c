@@ -9,6 +9,7 @@ extern void io_store_eflags(int eflags);
 void init_palette(void);
 void set_palette(int start, int end, unsigned char *rgb);
 void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, int x1, int y1);
+void init_screen(char *vram, int x, int y);
 
 /*
 	color name in the palette
@@ -44,22 +45,21 @@ void demo_fill_screen()
 	}
 }
 
+
+struct BOOTINFO {
+	char cyls, leds, vmode, reserve;
+	short scrnx, scrny;
+	char *vram;
+};
+
 void HariMain(void)
 {
-	int xsize, ysize;
-	short *binfo_scrnx, *binfo_scrny;
-	int *binfo_vram;
-
 	init_palette();
 
-	// those infor were saved by asmhead.asm
-	binfo_scrnx = (short *) 0x0ff4;
-	binfo_scrny = (short *) 0x0ff6;
-	binfo_vram = (int *) 0x0ff8;
-	xsize = *binfo_scrnx;
-	ysize = *binfo_scrny;
-
-	char *vram = (char *) *binfo_vram;   // 0xa0000
+	struct BOOTINFO *binfo = (struct BOOTINFO *) 0x0ff0; // those infor were saved by asmhead.asm
+	int xsize = (*binfo).scrnx;
+	int ysize = (*binfo).scrny;
+	char *vram = (*binfo).vram; // 0xa0000
 
 	init_screen(vram, xsize, ysize);
 
