@@ -2,7 +2,8 @@
 https://vanya.jp.net/os/haribote.html#hrb
 */
 
-OUTPUT_FORMAT("binary");
+OUTPUT_FORMAT("binary")
+OUTPUT_ARCH(i386)
 
 SECTIONS
 {
@@ -17,7 +18,7 @@ SECTIONS
         LONG(HariMain - 0x20) /* 28 : エントリアドレス - 0x20 */
         LONG(0)               /* 32 : heap領域（malloc領域）開始アドレス */
     }
-
+    . = 0x7c00;
     .text : { *(.text) }
 
     .data 0x310000 : AT ( ADDR(.text) + SIZEOF(.text) ) {
