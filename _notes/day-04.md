@@ -104,7 +104,13 @@ https://gitee.com/paud/30daysOS/blob/master/projects/05_day/harib02d
 
 字符可以用8×16的长方形像素点阵来表示
 要显示一个字符需要16个字节
-
+```
+    // Font data for charactor A
+    static char font_A[16] = {
+        0x00, 0x18, 0x18, 0x18, 0x18, 0x24, 0x24, 0x24,
+        0x24, 0x7e, 0x42, 0x42, 0x42, 0xe7, 0x00, 0x00
+    };
+```
 增加字体
 https://gitee.com/paud/30daysOS/blob/master/projects/05_day/harib02e
 The font data is a text file contains information of 256 charactors
