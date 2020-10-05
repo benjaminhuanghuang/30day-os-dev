@@ -13,14 +13,8 @@ asmhead.bin : asmhead.asm
 nasmfunc.o : nasmfunc.asm
 	nasm -g -f elf nasmfunc.asm -o nasmfunc.o
 
-font.o : font.c
-	$(CC) $(CFLAGS) font.c -o font.o
-
-mysprintf.o : mysprintf.c
-  $(CC) $(CFLAGS) -nostdlib $^ -o $@
-
-bootpack.hrb : bootpack.c font.c har.ld nasmfunc.o font.o mysprintf.o
-	gcc -march=i486 -m32 -nostdlib -T har.ld -fno-pie bootpack.c font.o mysprintf.o nasmfunc.o -o bootpack.hrb
+bootpack.hrb : bootpack.c font.c har.ld nasmfunc.o mysprintf.c
+	gcc -march=i486 -m32 -nostdlib -T har.ld -fno-pie bootpack.c font.c mysprintf.c nasmfunc.o -o bootpack.hrb
 
 haribote.sys : asmhead.bin bootpack.hrb
 	cat asmhead.bin bootpack.hrb > haribote.sys
