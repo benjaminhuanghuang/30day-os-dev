@@ -127,3 +127,7 @@ s X X X _ _ X X X，
 
 128 + 64 + 32 + 4 + 2 + 1
 以二进制表示，为“ 11100111”
+
+## link stdio.h 失败
+https://qiita.com/pollenjp/items/d0f4e09a7fd50dfd58f5
+http://bttb.s1.valueserver.jp/wordpress/blog/2017/12/17/makeos-5-2/

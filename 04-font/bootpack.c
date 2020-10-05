@@ -1,5 +1,5 @@
 
-#include <stdio.h>
+// #include <stdio.h>
 
 extern void io_hlt(void);
 extern void io_cli(void);
@@ -8,6 +8,8 @@ extern int io_load_eflags(void);
 extern void io_store_eflags(int eflags);
 extern char hankaku[4096];   // 256 chars
 
+// use mysprintf
+extern void sprintf(char *str, char *fmt, ...);
 // extern void write_mem8(int addr, int data);   // demo memory write
 
 void init_palette(void);
