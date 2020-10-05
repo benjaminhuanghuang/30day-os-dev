@@ -1,4 +1,6 @@
 
+#include <stdio.h>
+
 extern void io_hlt(void);
 extern void io_cli(void);
 extern void io_out8(int port, int data);
@@ -66,9 +68,13 @@ void HariMain(void)
 
 	init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
 	putfonts8_asc(binfo->vram, binfo->scrnx,  8,  8, COL8_FFFFFF, "ABC 123");
-	putfonts8_asc(binfo->vram, binfo->scrnx, 31, 31, COL8_000000, "Haribote OS.");
-	putfonts8_asc(binfo->vram, binfo->scrnx, 30, 30, COL8_FFFFFF, "Haribote OS.");
+	putfonts8_asc(binfo->vram, binfo->scrnx, 31, 31, COL8_000000, "Hello OS.");
+	putfonts8_asc(binfo->vram, binfo->scrnx, 30, 30, COL8_FFFFFF, "Hello OS.");
 	
+	char s[40];
+	sprintf(s, "scrnx = %d", binfo->scrnx);
+	putfonts8_asc(binfo->vram, binfo->scrnx, 16, 64, COL8_FFFFFF, s);
+
 	for (;;)
 	{
 		io_hlt();
