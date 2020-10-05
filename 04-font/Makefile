@@ -19,7 +19,7 @@ font.o : font.c
 mysprintf.o : mysprintf.c
   $(CC) $(CFLAGS) -nostdlib $^ -o $@
 
-bootpack.hrb : bootpack.c font.c har.ld nasmfunc.o  
+bootpack.hrb : bootpack.c font.c har.ld nasmfunc.o font.o mysprintf.o
 	gcc -march=i486 -m32 -nostdlib -T har.ld -fno-pie bootpack.c font.o mysprintf.o nasmfunc.o -o bootpack.hrb
 
 haribote.sys : asmhead.bin bootpack.hrb
