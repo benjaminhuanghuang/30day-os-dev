@@ -12,8 +12,7 @@ RULEFILE = $(TOOLPATH)haribote/haribote.rul
 EDIMG    = $(TOOLPATH)edimg
 MAKEFONT = $(TOOLPATH)makefont
 IMGTOL   = $(TOOLPATH)imgtol.com
-COPY     = cp
-DEL      = del
+DEL      = rm
 
 # デフォルト動作
 
@@ -41,7 +40,7 @@ nasmfunc.obj : nasmfunc.asm Makefile
 	$(NASK) nasmfunc.asm nasmfunc.obj nasmfunc.lst
 	
 hankaku.bin : hankaku.txt Makefile
-	$(MAKEFONT) hankaku.txt font.bin
+	$(MAKEFONT) hankaku.txt hankaku.bin
 
 hankaku.obj : hankaku.bin Makefile
 	$(BIN2OBJ) hankaku.bin hankaku.obj _hankaku
@@ -84,7 +83,8 @@ clean :
 	-$(DEL) bootpack.bim
 	-$(DEL) bootpack.hrb
 	-$(DEL) haribote.sys
-
+	-$(DEL) *.img
+	-$(DEL) *.o
 src_only :
 	$(MAKE) clean
 	-$(DEL) haribote.img

@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 
 extern void io_hlt(void);
