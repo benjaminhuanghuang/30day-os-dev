@@ -1,5 +1,5 @@
 
-// #include <stdio.h>
+#include <stdio.h>
 
 extern void io_hlt(void);
 extern void io_cli(void);
@@ -8,8 +8,6 @@ extern int io_load_eflags(void);
 extern void io_store_eflags(int eflags);
 extern char hankaku[4096];   // 256 chars
 
-// use mysprintf
-extern void sprintf(char *str, char *fmt, ...);
 // extern void write_mem8(int addr, int data);   // demo memory write
 
 void init_palette(void);
@@ -47,8 +45,8 @@ void demo_fill_screen()
 	//   write_mem8(i, 15); // MOV BTYPE [i], 15
 	// }
 	char *p = (char *)0xa0000;
-
-	for (int i = 0; i <= 0xffff; i++)
+	int i;
+	for (i = 0; i <= 0xffff; i++)
 	{
 		*(p + i) = i & 0x0f;
 	}
@@ -66,7 +64,7 @@ void HariMain(void)
 	init_palette();
 
 	struct BOOTINFO *binfo = (struct BOOTINFO *) 0x0ff0; // those infor were saved by asmhead.asm
-
+	extern char hankaku[4096];
 
 	init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
 	putfonts8_asc(binfo->vram, binfo->scrnx,  8,  8, COL8_FFFFFF, "ABC 123");
