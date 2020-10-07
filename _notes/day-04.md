@@ -1,5 +1,24 @@
+# 
+这一部分的难点是把 asm 代码和 c语言代码 以及 c 标准库 编译链接在一起
+
+- https://wiki.osdev.org/GCC_Cross-Compiler
+
 
 ## C + ASM 混合编译
+
+原书中作者使用的技术和toolset
+
+
+
+
+## 在 Mac下
+```
+    brew install x86_64-elf-gcc
+```
+
+
+## Build in Ubuntu 
+
 https://blog.goo.ne.jp/nekomemo2/e/f9718b447d4461507b182e371009b859
 
 https://qiita.com/pollenjp/items/8fcb9573cdf2dc6e2668
@@ -76,9 +95,12 @@ SECTIONS
 
 }
 ```
-
 gcc 在Mac OS X上无法使用链接描述文件
 Linux上的GNU ld程序接受-T <scriptname>选项，但在Mac OS上，-T是未知命令选项。
+
+在Ununtu下遇到一个问题: 无法link c stand lib
+```
+```
 
 
 ## 256 palette
