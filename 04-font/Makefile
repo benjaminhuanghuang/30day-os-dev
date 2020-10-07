@@ -1,38 +1,83 @@
-CC = gcc
-CFLAGS = -c -m32 -march=i486 -nostdlib
+TOOLPATH = ../z_tools/
+INCPATH  = ../z_tools/haribote/
 
-default:
-	make img
-	
-boot.bin : boot.asm 
-	nasm boot.asm -o boot.bin 
+MAKE     = $(TOOLPATH)makefont -r
+NASK     = $(TOOLPATH)nask
+CC1      = $(TOOLPATH)gocc1 -I$(INCPATH) -Os -Wall -quiet
+GAS2NASK = $(TOOLPATH)gas2nask -a
+OBJ2BIM  = $(TOOLPATH)obj2bim
+BIM2HRB  = $(TOOLPATH)bim2hrb
+RULEFILE = $(TOOLPATH)haribote/haribote.rul
+EDIMG    = $(TOOLPATH)edimg
+IMGTOL   = $(TOOLPATH)imgtol.com
+COPY     = copy
+DEL      = del
 
-asmhead.bin : asmhead.asm 
-	nasm asmhead.asm -o asmhead.bin
+# デフォルト動作
 
-nasmfunc.o : nasmfunc.asm
-	nasm -g -f elf nasmfunc.asm -o nasmfunc.o
+default :
+	$(MAKE) img
 
-bootpack.hrb : bootpack.c font.c har.ld nasmfunc.o mysprintf.c
-	gcc -march=i486 -m32 -nostdlib -T har.ld -fno-pie bootpack.c font.c mysprintf.c nasmfunc.o -o bootpack.hrb
+# ファイル生成規則
 
-haribote.sys : asmhead.bin bootpack.hrb
-	cat asmhead.bin bootpack.hrb > haribote.sys
+ipl10.bin : boot.asm Makefile
+	$(NASK) boot.asm boot.bin
 
-myos.img : boot.bin haribote.sys
-	mformat -f 1440 -C -B boot.bin -i myos.img ::
-	mcopy haribote.sys -i myos.img ::
+asmhead.bin : asmhead.asm Makefile
+	$(NASK) asmhead.asm asmhead.bin
+
+bootpack.gas : bootpack.c Makefile
+	$(CC1) -o bootpack.gas bootpack.c
+
+bootpack.nas : bootpack.gas Makefile
+	$(GAS2NASK) bootpack.gas bootpack.nas
+
+bootpack.obj : bootpack.nas Makefile
+	$(NASK) bootpack.nas bootpack.obj
+
+nasmfunc.obj : nasmfunc.asm Makefile
+	$(NASK) nasmfunc.asm nasmfunc.obj
+
+bootpack.bim : bootpack.obj nasmfunc.obj Makefile
+	$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map \
+		bootpack.obj nasmfunc.obj
+# 3MB+64KB=3136KB
+
+bootpack.hrb : bootpack.bim Makefile
+	$(BIM2HRB) bootpack.bim bootpack.hrb 0
+
+haribote.sys : asmhead.bin bootpack.hrb Makefile
+	copy /B asmhead.bin+bootpack.hrb haribote.sys
+
+haribote.img : ipl10.bin haribote.sys Makefile
+	$(EDIMG)   imgin:../z_tools/fdimg0at.tek \
+		wbinimg src:ipl10.bin len:512 from:0 to:0 \
+		copy from:haribote.sys to:@: \
+		imgout:haribote.img
+
 
 img :
-	make -r myos.img
+	$(MAKE) haribote.img
 
 run :
-	make img
+	$(MAKE) img
 	qemu-system-i386 -fda myos.img -boot a
-		
-debug :
-	make img
-	qemu-system-i386 -fda myos.img -gdb tcp::10000 -S
+
+install :
+	$(MAKE) img
+	$(IMGTOL) w a: haribote.img
 
 clean :
-	rm *.lst *.bin *.sys *.img *.hrb *.o
+	-$(DEL) *.bin
+	-$(DEL) *.lst
+	-$(DEL) *.gas
+	-$(DEL) *.obj
+	-$(DEL) bootpack.nas
+	-$(DEL) bootpack.map
+	-$(DEL) bootpack.bim
+	-$(DEL) bootpack.hrb
+	-$(DEL) haribote.sys
+
+src_only :
+	$(MAKE) clean
+	-$(DEL) haribote.img
