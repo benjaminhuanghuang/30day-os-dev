@@ -7,3 +7,6 @@
 *.sys
 *.hrb
 *.sys
+*.obj
+*.map
+*.bim

@@ -23,3 +23,7 @@ c -> gas -> nas ->obj
 %.obj : %.nas Makefile
 	$(NASK) $*.nas $*.obj $*.lst
 ```  
+
+
+## GDT & IDT
+

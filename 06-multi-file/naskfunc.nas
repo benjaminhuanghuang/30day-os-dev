@@ -83,6 +83,12 @@ _io_store_eflags:	; void io_store_eflags(int eflags);
    POPFD		; POP EFLAGS
    RET
 
+; 指定的段上限（limit）和地址值赋值给名为GDTR的48位寄存器。
+; 这是一个很特别的48位寄存器，并不能用我们常用的MOV指令来赋值。
+; 给它赋值的时候，唯一的方法就是指定一个内存地址，从指定的地址读取6个字节（也就是48位），
+; 然后赋值给GDTR寄存器。完成这一任务的指令，就是LGDT。
+; 该寄存器的低16位（即内存的最初2个字节）是段上限，它等于“GDT的有效字节数 -1”。
+; 剩下的高32位（即剩余的4个字节），代表GDT的开始地址。
 _load_gdtr:		; void load_gdtr(int limit, int addr);
    MOV		AX,[ESP+4]		; limit
    MOV		[ESP+6],AX
