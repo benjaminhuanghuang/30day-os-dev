@@ -25,5 +25,9 @@ c -> gas -> nas ->obj
 ```  
 
 
-## GDT & IDT
+## Mouse
+https://gitee.com/paud/30daysOS/tree/master/projects/06_day/harib03d
 
+鼠标指针的移动必须使用中断，而要使用中断，则必须将GDT和IDT正确无误地初始化。
+
+PIC(programmable interrupt controller)
