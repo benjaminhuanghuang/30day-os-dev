@@ -9,6 +9,8 @@ void HariMain(void)
 
 	init_gdtidt();
 	init_pic();
+	io_sti();    /*由于 IDT / PIC的初始化已完成，取消禁止CPU中断*/
+
 	
 	init_palette();
 	init_screen8(binfo->vram, binfo->scrnx, binfo->scrny);
@@ -18,6 +20,9 @@ void HariMain(void)
 	putblock8_8(binfo->vram, binfo->scrnx, 16, 16, mx, my, mcursor, 16);
 	sprintf(s, "(%d, %d)", mx, my);
 	putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
+
+	io_out8(PIC0_IMR, 0xf9); /* Allow PIC1 and keyboard(11111001) */
+	io_out8(PIC1_IMR, 0xef); /* Allow mouse (11101111) */
 
 	for (;;) {
 		io_hlt();
