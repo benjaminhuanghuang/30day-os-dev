@@ -25,31 +25,6 @@ void init_pic(void)
   return;
 }
 
-#define PORT_KEYDAT		0x0060
-struct FIFO8 keyfifo;
-
-void inthandler21(int *esp)
-/* PS/2 Keyboard */
-{
-	unsigned char data;
-	io_out8(PIC0_OCW2, 0x61);	/* IRQ-01受付完了をPICに通知 */
-	data = io_in8(PORT_KEYDAT);
-	fifo8_put(&keyfifo, data);
-	return;
-}
-
-struct FIFO8 mousefifo;
-void inthandler2c(int *esp)
-/* PS/2 mouse */
-{
-	unsigned char data;
-	io_out8(PIC1_OCW2, 0x64);	/* 通知PIC1 IRQ-12接受完成 */
-	io_out8(PIC0_OCW2, 0x62);	/* 通知PIC0 IRQ-02接受完成 */
-	data = io_in8(PORT_KEYDAT);
-	fifo8_put(&mousefifo, data);
-	return;
-}
-
 void inthandler27(int *esp)
 {
 	io_out8(PIC0_OCW2, 0x67); /* 通知PIC IRQ-07接受完成 */
