@@ -10,3 +10,8 @@
 asm + c 的混合编译在不同的环境下会出问题
 作者在(hrb.osask.jp)提供了 windows， linux， macos下的tool set
 
+
+## Run
+```
+  make run
+```
