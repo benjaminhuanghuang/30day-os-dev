@@ -32,3 +32,7 @@ void memman_init(struct MEMMAN *man);
 unsigned int memman_total(struct MEMMAN *man);
 unsigned int memman_alloc(struct MEMMAN *man, unsigned int size);
 ```
+
+
+## Refactor memory.c（harib07a）
+
