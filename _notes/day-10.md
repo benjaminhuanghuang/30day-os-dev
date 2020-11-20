@@ -32,3 +32,6 @@ void sheet_refresh(struct SHTCTL *ctl);
 void sheet_slide(struct SHTCTL *ctl, struct SHEET *sht, int vx0, int vy0);
 void sheet_free(struct SHTCTL *ctl, struct SHEET *sht);
 ```
+
+
+## Refactor shtctl的指定省略（harib08c）
