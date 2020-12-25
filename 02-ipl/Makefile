@@ -15,11 +15,8 @@ myos.img : ipl.bin Makefile
 		wbinimg src:ipl.bin len:512 from:0 to:0 \
 		imgout:myos.img
 
-img:
-	$(MAKE) myos.img
-
 run :
-	$(MAKE) img
+	$(MAKE) myos.img
 	qemu-system-i386 -fda myos.img -boot a
 
 
