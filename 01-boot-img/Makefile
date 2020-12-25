@@ -1,5 +1,5 @@
 boot.bin : boot.asm
-	nasm -f bin boot.asm -o boot.bin -l boot.lst
+	nask.exe ipl.nas boot.bin ipl.lst
 	
 clean:
 	rm boot.bin boot.lst

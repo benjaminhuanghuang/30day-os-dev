@@ -1,20 +1,57 @@
+一开始要写一个“只要一通电就能运行的程序”。这部分用C语言写起来有些困难，所以主要还是用汇编语言来写。
 
-## Loader
-- [loader](https://blog.csdn.net/tyler_download/article/details/51761750)
+## 实验 1
+用二进制Editor 编写一个 helloos.img (成品见 随书光盘中名为projects\01_day\helloos0)
 
-用java做一个最小的操作系统内核2.
-https://blog.csdn.net/tyler_download/article/details/51761750
+0 ～ 000089，输入一些code
 
-《30天自制操作系统》——虚拟机使用
-https://blog.csdn.net/ekkie/article/details/51345149
+000090～168000 全是 0
+
+0001FE 处为 55 AA F0 FF FF      1FF = 511, 1FE = 55, 1FF = AA,说明这是启动扇区 
+
+001400 处为 F0 FF FF
 
 
-##  Complie the boot.nas
+16进制168000 = 10进制1474560 = 1440×1024字节, 这正好是一个floppy disk的大小
+
+把这个helloos.imge 写入A盘就可以启动机器
 ```
-  brew install nasm
-  
-  nasm -f bin boot.asm -o boot.bin -l boot.lst
+  z_tools\imgtol.com w a: helloos.img
 ```
+
+或者用 虚拟机软件 qemu 来加载这个img
+```
+  qemu-system-x86_64 -fda boot.bin -boot a
+``` 
+## 实验2: 用ASM 写 initial program loader（IPL）
+
+在asm代码直接包含了FAT12文件系统信息
+
+![](./_images/fat12.png)
+
+![](./_images/fat12-boot.png)
+
+
+因为根目录区从19扇区开始，每个扇区512bytes，因此根目录下第一个文件的目录信息开始于19*512 = 0x2600
+
+数据区开始扇区号 = 根目录开始扇区号+ 目录所占区号 = 19 + 14 = 33
+
+第一个文件的起始位置在 512 * 33 = 0x4200
+
+计算机读写软盘的时候，并不是一个字节一个字节地读写的，而是以512字节为一个单位进行读写。因此，软盘的512字节就称为一个扇区。
+一张软盘的空间共有1440KB，也就是1474560字节，除以512得2880，这也就是说一张软盘共有2880个扇区。
+
+如果第一个扇区最后2个字最后两个字节正好是0x55 AA，那它就认为这个扇区的开头是启动程序，并开始执行这个程序。
+
+业界标准规定 boot section 的512 字节要被加载到内存的  0x7c00 ~ 0x7dff
+
+这就是汇编代码 `ORG    0x7C00` 的原因
+
+Complie the boot.nas
+```
+  z_tools\nask.exe ipl.nas ipl.bin ipl.lst
+```
+列表文件ipl.lst是一个文本文件，可以用来简单地确认每个指令是怎样翻译成机器语言的。
 
 ## Method 1: Run the boot.bin using qemu
 ```

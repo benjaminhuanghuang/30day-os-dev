@@ -48,10 +48,12 @@ qemu-system-x86_64
 ```
 qemu-img create /f qcow2 xxx.img 10G
 ```
+
 2. 在虚拟机文件系统中安装操作系统
 ```
 qemu-system-i386 -hda xxx.img -cdrom xxx.iso -boot d 以xxx.img为文件系统，xxx.iso是系统安装ISO文件
 ```
+
 3. 运行安装好的操作系统
 ```
 qemu-system-i386 -hda xxx.img 运行xxx.img中的系统
