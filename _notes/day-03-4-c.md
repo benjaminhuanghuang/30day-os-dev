@@ -1,24 +1,18 @@
-# Toolset
-作者在(http://hrb.osask.jp/)提供了 windows， linux， macos下的tool set
+## Use C language
+从本节开始，
+os 分成 ASM 和 C语言两部分编写的。
+ASM 部分为 asmhead.asm
+C 语言部分文件名是bootpack.c。以后为了启动操作系统，还要写各种其他的处理，我们想要把这些处理打成一个包（pack）
 
+函数名HariMain非常重要，程序就是从以HariMain命名的函数开始运行的，所以这个函数名不能更改。
 
+C 代码处理
+1. 使用cc1.exe从bootpack.c生成bootpack.gas。
+2. 使用gas2nask.exe从bootpack.gas生成bootpack.nas。
+3. 使用nask.exe从bootpack.nas生成bootpack.obj。
+4. 使用obi2bim.exe从bootpack.obj生成bootpack.bim。
+5. 使用bim2hrb.exe从bootpack.bim生成bootpack.hrb。 这样就做成了机器语言，再使用copy指令将asmhead.bin与bootpack.hrb单纯结合到起来，就成了haribote.sys。
 
-在开发操作系统时，需要用到CPU上的许多控制操作系统的寄存器。一般的C编译器都是用于开发应用程序的，所以根本没有任何操作这些寄存器的命令。
-另外，C编译器还的自动优化功能，有时候会给带来麻烦。
-
-
-
-asm + c 的混合编译在不同的环境下会出问题
-
-
-## 汇编器 nask
-nask 很多语法都模仿了NASM
-
-```
-  nask helloos.nas helloos.img
-```
-
-## Tools for C language
 `c1`是C编译器，可以将C语言程序编译成汇编语言源程序。但这个C编译器是笔者从名为gcc的编译器改造而来，而gcc又是以gas汇编语言为基础，输出的是gas用的源程序
 
 所以我们需要把gas变换成nask能翻译的语法，这就是`gas2nask`.
@@ -28,9 +22,5 @@ nask 很多语法都模仿了NASM
 将必要的目标文件全部链接上，需要使用`obj2bim`。bim是笔者设计的一种文件格式，意思是“binary image”，它是一个二进制映像文件。bim文件也“不是本来的状态，而是一种代替的形式”，也还不是完成品。这只是将各个部分全部都链接在一起，做成了一个完整的机器语言文件，
 
 而为了能实际使用，还需要针对每一个**不同操作系统的要求进行必要的加工**，比如说加上识别用的文件头，或者压缩等。笔者为此专门写了一个程序bim2hrb.exe
-
-
-
-
 
 
