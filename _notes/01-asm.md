@@ -53,3 +53,7 @@ GS——没有名称（segment part 3）
 ```
   MOV AL, BYTE [BX]
 ```
+
+
+## JMP, JC
+JC，是“jump if carry”的缩写，意思是如果进位标志（carry flag）是1的话，就跳转

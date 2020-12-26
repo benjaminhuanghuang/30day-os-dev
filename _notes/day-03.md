@@ -1,3 +1,5 @@
+
+
 # 32 bits Protected mode
 - [java开发操作系统内核：由实模式进入保护模式之32位寻址](https://blog.csdn.net/tyler_download/article/details/52021120)
 
