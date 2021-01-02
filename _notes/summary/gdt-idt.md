@@ -63,11 +63,18 @@ GDT 和 IDT 是与CPU有关的设定。为了让操作系统能够使用32位模
 
 bootpack.h
 ```
-// 存放 8 字节 GDT的内容
+// 存放 8 字节 GDT
 struct SEGMENT_DESCRIPTOR {
 	short limit_low, base_low;
 	char base_mid, access_right;
 	char limit_high, base_high;
+};
+
+// 存放 8 字节 IDT
+struct GATE_DESCRIPTOR {
+	short offset_low, selector;
+	char dw_count, access_right;
+	short offset_high;
 };
 
 void init_gdtidt(void);
@@ -91,9 +98,9 @@ void init_gdtidt(void)
 		set_segmdesc(gdt + i, 0, 0, 0);
 	}
 	/*
-	段号为1的段，上限值为0xffffffff即大小正好是4GB），地址是0，它表示的是CPU所能管理的全部内存本身。段的属性设为0x4092，它的含义我们留待明天再说。
-	段号为2的段，它的大小是512KB，地址是0x280000。这正好是为bootpack.hrb而准备的。用这个段，就可以执行bootpack.hrb。
-	因为bootpack.hrb是以ORG 0为前提翻译成的机器语言
+		段号为1的段，上限值为0xffffffff即大小正好是4GB），地址是0，它表示的是CPU所能管理的全部内存本身。段的属性设为0x4092，它的含义我们留待明天再说。
+		段号为2的段，它的大小是512KB，地址是0x280000。这正好是为bootpack.hrb而准备的。用这个段，就可以执行bootpack.hrb。
+		因为bootpack.hrb是以ORG 0为前提翻译成的机器语言
 	*/
 	set_segmdesc(gdt + 1, 0xffffffff, 0x00000000, 0x4092);
 	set_segmdesc(gdt + 2, 0x0007ffff, 0x00280000, 0x409a);
