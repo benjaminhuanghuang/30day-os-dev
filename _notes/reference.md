@@ -18,3 +18,8 @@ Physical Address = Segment << 4 + Offset
 80396 is 32bit CPU, it has 32 bit Address Bus (4G address space)
 Under 32bit Protected mode, the Segment register is a index of GDT (Global Descriptor Tabl)
 
+## link stdio.h 失败
+
+https://qiita.com/pollenjp/items/d0f4e09a7fd50dfd58f5
+http://bttb.s1.valueserver.jp/wordpress/blog/2017/12/17/makeos-5-2/
+
