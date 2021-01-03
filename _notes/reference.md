@@ -23,3 +23,8 @@ Under 32bit Protected mode, the Segment register is a index of GDT (Global Descr
 https://qiita.com/pollenjp/items/d0f4e09a7fd50dfd58f5
 http://bttb.s1.valueserver.jp/wordpress/blog/2017/12/17/makeos-5-2/
 
+
+
+- haribote asmhead.nas 从实模式进入保护模式程序阅读注释
+https://blog.csdn.net/misskissC/article/details/100587952
+

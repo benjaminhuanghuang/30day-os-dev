@@ -1,0 +1,36 @@
+讲解CPU的书上会写到，通过代入CR0而切换到保护模式时，要马上执行JMP指令。所以我们也执行这一指令。为什么要执行JMP指令呢？因为变成保护模式后，机器语言的解释要发生变化。CPU为了加快指令的执行速度而使用了管道（pipeline）这一机制，就是说，前一条指令还在执行的时候，就开始解释下一条甚至是再下一条指令。因为模式变了，就要重新解释一遍，所以加入了JMP指令。
+
+
+```
+  ; 设置GDT,
+  ; 将设置在0:GDTR0处的GDT信息加载到GDTR寄存器中。
+  LGDT [GDTR0]
+
+  ; 禁止内存分页机制(CR0.bit[31]=0),
+  ; 开启保护模式(CR0.bit[0]=1)。
+  MOV EAX,CR0
+  AND EAX,0x7fffffff
+  OR  EAX,0x00000001
+  MOV CR0,EAX
+  JMP pipelineflush ; 刷新CPU预取指队列
+
+  ;开启保护模式后,CPU以保护模式机制运行,在开启保护模式指令之后的指令
+  ;都会以保护模式运行方式运行。x86CPU手册中提示,需在开启保护模式指令
+  ;后立即跟一条跳转指令以刷新(丢掉)CPU预取指队列中的指令。
+  ;
+  ;刷新CPU预取指队列的跳转指令jmp pipelineflush 是在实模式下被读入到
+  ;CPU中的,CPU在实模式下执行跳转指令时会刷新CPU预取指队列,
+  ;同时jmp pipelineflush 这条跳转指令也能在保护模式下正确运行,因为它
+  ;是一条段内跳转指令,其跳转与段地址无关,
+  ;jmp pipelineflush功能相当于EIP += pipelineflush - EIP。
+
+  pipelineflush:
+  ; 进入保护模式用跳转指令刷新CPU预取指队列后,
+  ; 需设置各数据段寄存器指向数据内存段。
+  MOV AX,1*8
+  MOV DS,AX
+  MOV ES,AX
+  MOV FS,AX
+  MOV GS,AX
+  MOV SS,AX
+```

@@ -35,4 +35,16 @@ unsigned int memman_alloc(struct MEMMAN *man, unsigned int size);
 
 
 ## Refactor memory.c（harib07a）
+memman_alloc和memman_free能够以1字节为单位进行内存管理，这种方式虽然不错，但是有一点不足——在反复进行内存分配和内存释放之后，内存中就会出现很多不连续的小段未使用空间，这样就会把man->frees消耗殆尽
 
+
+因此，我们要编写一些总是以0x1000字节为单位进行内存分配和释放的函数，它们会把指定的内存大小按0x1000字节为单位向上舍入（roundup），而之所以要以0x1000字节为单位，是因为笔者觉得这个数比较规整。另外，0x1000字节的大小正好是4KB。
+
+```
+	// 向上
+	i = (i + 0xfff) & 0xfffff000;
+
+	// 向下
+	i = i & 0xfffff000;
+```
+## 叠加处理（harib07b）
