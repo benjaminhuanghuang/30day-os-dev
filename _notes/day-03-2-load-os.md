@@ -2,7 +2,7 @@
 ```
 projects/03_day/harib00e
 ```
-![](./_images/fat12.png)
+![](./_images/boot-sector.png)
 
 ![](./_images/fat12-boot.png)
 
@@ -15,7 +15,7 @@ projects/03_day/harib00e
 
 因此，向一个空软盘保存文件时，
 - 文件名会写在0x002600以后的地方；
-- 文件的内容会写在0x004200以后的地方。这就是我们一直想知道的东西。
+- 文件的内容会写在0x004200以后的地方。
 
 所以可以将操作系统本身的内容写到名为haribote.sys文件中，再把它保存到磁盘映像里，然后从启动区执行这个haribote.sys
 
