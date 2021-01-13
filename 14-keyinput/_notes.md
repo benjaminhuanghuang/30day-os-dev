@@ -22,3 +22,16 @@ https://gitee.com/paud/30daysOS/blob/master/projects/14_day/harib11e/asmhead.nas
 ## 4 键盘输入（1）（harib11f）
 
 下键时的数值 + 0x80 = 键弹起时的数值
+
+## 5 键盘输入（2）（harib11g）
+```
+static char keytable[0x54] {
+
+}
+```
+
+## 6 追记内容（1）（harib11h）
+Draw input box
+```
+void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
+```
