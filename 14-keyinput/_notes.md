@@ -21,3 +21,4 @@ https://gitee.com/paud/30daysOS/blob/master/projects/14_day/harib11e/asmhead.nas
 
 ## 4 键盘输入（1）（harib11f）
 
+下键时的数值 + 0x80 = 键弹起时的数值

@@ -4,6 +4,14 @@
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title);
 void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, int l);
 
+static char keytable[0x54] = {
+		0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '^', 0, 0,
+		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '@', '[', 0, 0, 'A', 'S',
+		'D', 'F', 'G', 'H', 'J', 'K', 'L', '; ', ':', 0, 0, ']', 'Z', 'X', 'C', 'V',
+		'B', 'N', 'M', ', ', '.', '/', 0, '＊', 0, ' ', 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, '7', '8', '9', '-', '4', '5', '6', '+', '1',
+		'2', '3', '0', '.'};
+
 void HariMain(void)
 {
 	struct BOOTINFO *binfo = (struct BOOTINFO *)ADR_BOOTINFO;
@@ -78,8 +86,8 @@ void HariMain(void)
 
 	for (;;)
 	{
-		sprintf(s, "%010d", timerctl.count);
-		putfonts8_asc_sht(sht_win, 40, 28, COL8_000000, COL8_C6C6C6, s, 10);
+		// sprintf(s, "%010d", timerctl.count);
+		// putfonts8_asc_sht(sht_win, 40, 28, COL8_000000, COL8_C6C6C6, s, 10);
 
 		io_cli();
 		if (fifo32_status(&fifo) == 0)
@@ -94,6 +102,15 @@ void HariMain(void)
 				// keyboard data
 				sprintf(s, "%02X", i - 256);
 				putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF, COL8_008484, s, 2);
+				if (i < 256 + 0x54)
+				{
+					if (keytable[i - 256] != 0)
+					{
+						s[0] = keytable[i - 256];
+						s[1] = 0;
+						putfonts8_asc_sht(sht_win, 40, 28, COL8_000000, COL8_C6C6C6, s, 1);
+					}
+				}
 			}
 			else if (512 <= i && i <= 767)
 			{
