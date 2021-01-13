@@ -1,5 +1,3 @@
-/* bootpackのメイン */
-
 #include "bootpack.h"
 #include <stdio.h>
 
@@ -22,25 +20,25 @@ void HariMain(void)
 
 	init_gdtidt();
 	init_pic();
-	io_sti(); /* IDT/PICの初期化が終わったのでCPUの割り込み禁止を解除 */
+	io_sti();      // disable CPU interrupt.
 	fifo8_init(&keyfifo, 32, keybuf);
 	fifo8_init(&mousefifo, 128, mousebuf);
 	init_pit();
-	io_out8(PIC0_IMR, 0xf8); /* PITとPIC1とキーボードを許可(11111000) */
-	io_out8(PIC1_IMR, 0xef); /* マウスを許可(11101111) */
+	io_out8(PIC0_IMR, 0xf8);   /*Allow keyboard, timer PIC (111111000)*/
+	io_out8(PIC1_IMR, 0xef);   /*Allow mouse PIC (11101111)*/
 
+	/* Use one timer fifo for all timer, use different data */
 	fifo8_init(&timerfifo, 8, timerbuf);
 	timer = timer_alloc();
-	timer_init(timer, &timerfifo, 1);
+	timer_init(timer, &timerfifo, 10);
 	timer_settime(timer, 1000);
-	fifo8_init(&timerfifo2, 8, timerbuf2);
 	timer2 = timer_alloc();
-	timer_init(timer2, &timerfifo2, 1);
+	timer_init(timer2, &timerfifo, 3);
 	timer_settime(timer2, 300);
-	fifo8_init(&timerfifo3, 8, timerbuf3);
 	timer3 = timer_alloc();
-	timer_init(timer3, &timerfifo3, 1);
+	timer_init(timer3, &timerfifo, 1);
 	timer_settime(timer3, 50);
+
 
 	init_keyboard();
 	enable_mouse(&mdec);
@@ -56,14 +54,14 @@ void HariMain(void)
 	sht_win   = sheet_alloc(shtctl);
 	buf_back  = (unsigned char *) memman_alloc_4k(memman, binfo->scrnx * binfo->scrny);
 	buf_win   = (unsigned char *) memman_alloc_4k(memman, 160 * 52);
-	sheet_setbuf(sht_back, buf_back, binfo->scrnx, binfo->scrny, -1); /* 透明色なし */
+	sheet_setbuf(sht_back, buf_back, binfo->scrnx, binfo->scrny, -1); 
 	sheet_setbuf(sht_mouse, buf_mouse, 16, 16, 99);
-	sheet_setbuf(sht_win, buf_win, 160, 52, -1); /* 透明色なし */
+	sheet_setbuf(sht_win, buf_win, 160, 52, -1);
 	init_screen8(buf_back, binfo->scrnx, binfo->scrny);
 	init_mouse_cursor8(buf_mouse, 99);
 	make_window8(buf_win, 160, 52, "counter");
 	sheet_slide(sht_back, 0, 0);
-	mx = (binfo->scrnx - 16) / 2; /* 画面中央になるように座標計算 */
+	mx = (binfo->scrnx - 16) / 2; 
 	my = (binfo->scrny - 28 - 16) / 2;
 	sheet_slide(sht_mouse, mx, my);
 	sheet_slide(sht_win, 80, 72);
@@ -94,7 +92,6 @@ void HariMain(void)
 				i = fifo8_get(&mousefifo);
 				io_sti();
 				if (mouse_decode(&mdec, i) != 0) {
-					/* データが3バイト揃ったので表示 */
 					sprintf(s, "[lcr %4d %4d]", mdec.x, mdec.y);
 					if ((mdec.btn & 0x01) != 0) {
 						s[1] = 'L';
@@ -106,7 +103,6 @@ void HariMain(void)
 						s[2] = 'C';
 					}
 					putfonts8_asc_sht(sht_back, 32, 16, COL8_FFFFFF, COL8_008484, s, 15);
-					/* マウスカーソルの移動 */
 					mx += mdec.x;
 					my += mdec.y;
 					if (mx < 0) {
@@ -126,21 +122,21 @@ void HariMain(void)
 					sheet_slide(sht_mouse, mx, my);
 				}
 			} else if (fifo8_status(&timerfifo) != 0) {
-				i = fifo8_get(&timerfifo); /* とりあえず読み込む（からにするために） */
+				i = fifo8_get(&timerfifo); 
 				io_sti();
 				putfonts8_asc_sht(sht_back, 0, 64, COL8_FFFFFF, COL8_008484, "10[sec]", 7);
 			} else if (fifo8_status(&timerfifo2) != 0) {
-				i = fifo8_get(&timerfifo2); /* とりあえず読み込む（からにするために） */
+				i = fifo8_get(&timerfifo2); 
 				io_sti();
 				putfonts8_asc_sht(sht_back, 0, 80, COL8_FFFFFF, COL8_008484, "3[sec]", 6);
 			} else if (fifo8_status(&timerfifo3) != 0) {
 				i = fifo8_get(&timerfifo3);
 				io_sti();
 				if (i != 0) {
-					timer_init(timer3, &timerfifo3, 0); /* 次は0を */
+					timer_init(timer3, &timerfifo3, 0); 
 					boxfill8(buf_back, binfo->scrnx, COL8_FFFFFF, 8, 96, 15, 111);
 				} else {
-					timer_init(timer3, &timerfifo3, 1); /* 次は1を */
+					timer_init(timer3, &timerfifo3, 1);
 					boxfill8(buf_back, binfo->scrnx, COL8_008484, 8, 96, 15, 111);
 				}
 				timer_settime(timer3, 50);

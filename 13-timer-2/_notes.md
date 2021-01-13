@@ -5,7 +5,6 @@ void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b, char *s, i
 ```
 
 
-
 ## 2 重新调整FIFO缓冲区（1）（harib10b）
 
 把定时器用的多个FIFO缓冲区都集中成1个
