@@ -26,38 +26,38 @@ VRAM	EQU		0x0ff8			; 图形缓冲区起始地址
 
   ORG		0xc200			; 
 
-  ; check VBE(VESA BIOS extension)
+; check VBE(VESA BIOS extension)
 
-		MOV		AX,0x9000
-		MOV		ES,AX
-		MOV		DI,0
-		MOV		AX,0x4f00
-		INT		0x10
-		CMP		AX,0x004f
-		JNE		scrn320
+	MOV		AX,0x9000
+	MOV		ES,AX
+	MOV		DI,0
+	MOV		AX,0x4f00
+	INT		0x10
+	CMP		AX,0x004f
+	JNE		scrn320
 
 ; VBE version check
 
-		MOV		AX,[ES:DI+4]
-		CMP		AX,0x0200
-		JB		scrn320			; if (AX < 0x0200) goto scrn320
+	MOV		AX,[ES:DI+4]
+	CMP		AX,0x0200
+	JB		scrn320			; if (AX < 0x0200) goto scrn320
 
 ; get screen mode information
-		MOV		CX,VBEMODE
-		MOV		AX,0x4f01
-		INT		0x10
-		CMP		AX,0x004f
-		JNE		scrn320
+	MOV		CX,VBEMODE
+	MOV		AX,0x4f01
+	INT		0x10
+	CMP		AX,0x004f
+	JNE		scrn320
 
 ; Check the screen mode information.
 
-		CMP		BYTE [ES:DI+0x19],8
-		JNE		scrn320
-		CMP		BYTE [ES:DI+0x1b],4
-		JNE		scrn320
-		MOV		AX,[ES:DI+0x00]
-		AND		AX,0x0080
-		JZ		scrn320			; bit7 of the mode attribute was 0, so we give up.
+	CMP		BYTE [ES:DI+0x19],8
+	JNE		scrn320
+	CMP		BYTE [ES:DI+0x1b],4
+	JNE		scrn320
+	MOV		AX,[ES:DI+0x00]
+	AND		AX,0x0080
+	JZ		scrn320			; bit7 of the mode attribute was 0, so we give up.
 
 ; Switching screen modes
 		MOV		BX,VBEMODE+0x4000
