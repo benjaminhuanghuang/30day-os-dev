@@ -108,8 +108,6 @@ scrn320:
 ;
 ; 保护模式转换
 ;
-[INSTRSET "i486p"]				; 
-
 	LGDT	[GDTR0]			; 设置临时GDT
 	MOV		EAX,CR0
 	AND		EAX,0x7fffffff	; 将bit31设置为0（禁止分页）
