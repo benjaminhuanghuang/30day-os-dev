@@ -30,10 +30,12 @@ unsigned int memtest_sub(unsigned int start, unsigned int end);
 
 /* fifo.c */
 struct FIFO32 {
-	int *buf;
-	int p, q, size, free, flags;
+    int *buf;
+    int p, q, size, free, flags;
+    struct TASK *task;
 };
-void fifo32_init(struct FIFO32 *fifo, int size, int *buf);
+
+void fifo32_init(struct FIFO32 *fifo, int size, int *buf, struct TASK *task);
 int fifo32_put(struct FIFO32 *fifo, int data);
 int fifo32_get(struct FIFO32 *fifo);
 int fifo32_status(struct FIFO32 *fifo);
@@ -88,6 +90,7 @@ void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar);
 #define LIMIT_BOTPAK	0x0007ffff
 #define AR_DATA32_RW	0x4092
 #define AR_CODE32_ER	0x409a
+#define AR_TSS32		  0x0089
 #define AR_INTGATE32	0x008e
 
 /* int.c */
@@ -211,3 +214,5 @@ struct TASK *task_init(struct MEMMAN *memman);
 struct TASK *task_alloc(void);
 void task_run(struct TASK *task);
 void task_switch(void);
+void task_sleep(struct TASK *task);
+
