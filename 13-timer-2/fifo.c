@@ -45,5 +45,6 @@ int fifo32_get(struct FIFO32 *fifo)
 
 int fifo32_status(struct FIFO32 *fifo)
 {
+	/* How many data */
 	return fifo->size - fifo->free;
 }

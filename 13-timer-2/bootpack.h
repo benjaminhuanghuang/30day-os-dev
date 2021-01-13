@@ -1,10 +1,10 @@
 /* asmhead.nas */
 struct BOOTINFO { /* 0x0ff0-0x0fff */
-	char cyls; /* �u�[�g�Z�N�^�͂ǂ��܂Ńf�B�X�N��ǂ񂾂̂� */
-	char leds; /* �u�[�g���̃L�[�{�[�h��LED�̏�� */
-	char vmode; /* �r�f�I���[�h  ���r�b�g�J���[�� */
+	char cyls; /* How many cylindars */
+	char leds; /* */
+	char vmode; /*  */
 	char reserve;
-	short scrnx, scrny; /* ��ʉ𑜓x */
+	short scrnx, scrny; /* resolution */
 	char *vram;
 };
 #define ADR_BOOTINFO	0x00000ff0
@@ -109,8 +109,7 @@ void inthandler27(int *esp);
 /* keyboard.c */
 void inthandler21(int *esp);
 void wait_KBC_sendready(void);
-void init_keyboard(void);
-extern struct FIFO8 keyfifo;
+void init_keyboard(struct FIFO32 *fifo, int data0);
 #define PORT_KEYDAT		0x0060
 #define PORT_KEYCMD		0x0064
 
@@ -120,20 +119,22 @@ struct MOUSE_DEC {
 	int x, y, btn;
 };
 void inthandler2c(int *esp);
-void enable_mouse(struct MOUSE_DEC *mdec);
+void enable_mouse(struct FIFO32 *fifo, int data0, struct MOUSE_DEC *mdec);
 int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
-extern struct FIFO8 mousefifo;
+
 
 /* memory.c */
-#define MEMMAN_FREES		4090	/* ����Ŗ�32KB */
+#define MEMMAN_FREES		4090	
 #define MEMMAN_ADDR			0x003c0000
-struct FREEINFO {	/* ������� */
+struct FREEINFO {	
 	unsigned int addr, size;
 };
-struct MEMMAN {		/* �������Ǘ� */
+
+struct MEMMAN {		
 	int frees, maxfrees, lostsize, losts;
 	struct FREEINFO free[MEMMAN_FREES];
 };
+
 unsigned int memtest(unsigned int start, unsigned int end);
 void memman_init(struct MEMMAN *man);
 unsigned int memman_total(struct MEMMAN *man);
@@ -166,19 +167,22 @@ void sheet_free(struct SHEET *sht);
 /* timer.c */
 #define MAX_TIMER		500
 struct TIMER {
+	struct TIMER *next;
 	unsigned int timeout, flags;
-	struct FIFO8 *fifo;
-	unsigned char data;
+	struct FIFO32 *fifo;
+	int data;
 };
+
 struct TIMERCTL {
-	unsigned int count, next, using;
-	struct TIMER *timers[MAX_TIMER];
+	unsigned int count, next;
+	struct TIMER *t0;
 	struct TIMER timers0[MAX_TIMER];
 };
+
 extern struct TIMERCTL timerctl;
 void init_pit(void);
 struct TIMER *timer_alloc(void);
 void timer_free(struct TIMER *timer);
-void timer_init(struct TIMER *timer, struct FIFO8 *fifo, unsigned char data);
+void timer_init(struct TIMER *timer, struct FIFO32 *fifo, int data);
 void timer_settime(struct TIMER *timer, unsigned int timeout);
 void inthandler20(int *esp);
