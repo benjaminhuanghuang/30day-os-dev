@@ -35,3 +35,12 @@ Draw input box
 ```
 void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
 ```
+
+
+## 7 追记内容（2）（harib11i）
+move window
+```
+if ((mdec.btn & 0x01) != 0) {
+  sheet_slide(sht_win, mx - 80, my - 8);
+}
+```
