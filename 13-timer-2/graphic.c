@@ -23,7 +23,7 @@ void init_palette(void)
 	set_palette(0, 15, table_rgb);
 	return;
 
-	/* static char 命令は、データにしか使えないけどDB命令相当 */
+	/* static char, equal to DB instructions */
 }
 
 void set_palette(int start, int end, unsigned char *rgb)

@@ -1,7 +1,8 @@
 #include "bootpack.h"
 
 struct FIFO32 *mousefifo;
-int mousedata0;
+// mouse, keyboard, timer share same fifo
+int mousedata0;   // all mouse data will add this value. 
 
 void inthandler2c(int *esp)
 {
