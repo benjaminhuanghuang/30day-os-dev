@@ -1,10 +1,10 @@
 /* asmhead.nas */
 struct BOOTINFO { /* 0x0ff0-0x0fff */
-	char cyls; /* How many cylinder was read*/
-	char leds; /* LED status */
-	char vmode; /* Video mode How many bits of color */
+	char cyls; /* ƒu[ƒgƒZƒNƒ^‚Í‚Ç‚±‚Ü‚ÅƒfƒBƒXƒN‚ğ“Ç‚ñ‚¾‚Ì‚© */
+	char leds; /* ƒu[ƒg‚ÌƒL[ƒ{[ƒh‚ÌLED‚Ìó‘Ô */
+	char vmode; /* ƒrƒfƒIƒ‚[ƒh  ‰½ƒrƒbƒgƒJƒ‰[‚© */
 	char reserve;
-	short scrnx, scrny; /* x * y */
+	short scrnx, scrny; /* ‰æ–Ê‰ğ‘œ“x */
 	char *vram;
 };
 #define ADR_BOOTINFO	0x00000ff0
@@ -28,17 +28,15 @@ void asm_inthandler27(void);
 void asm_inthandler2c(void);
 unsigned int memtest_sub(unsigned int start, unsigned int end);
 
-
 /* fifo.c */
-struct FIFO32 {
-	int *buf;
+struct FIFO8 {
+	unsigned char *buf;
 	int p, q, size, free, flags;
 };
-void fifo32_init(struct FIFO32 *fifo, int size, int *buf);
-int fifo32_put(struct FIFO32 *fifo, int data);
-int fifo32_get(struct FIFO32 *fifo);
-int fifo32_status(struct FIFO32 *fifo);
-
+void fifo8_init(struct FIFO8 *fifo, int size, unsigned char *buf);
+int fifo8_put(struct FIFO8 *fifo, unsigned char data);
+int fifo8_get(struct FIFO8 *fifo);
+int fifo8_status(struct FIFO8 *fifo);
 
 /* graphic.c */
 void init_palette(void);
@@ -110,7 +108,8 @@ void inthandler27(int *esp);
 /* keyboard.c */
 void inthandler21(int *esp);
 void wait_KBC_sendready(void);
-void init_keyboard(struct FIFO32 *fifo, int data0);
+void init_keyboard(void);
+extern struct FIFO8 keyfifo;
 #define PORT_KEYDAT		0x0060
 #define PORT_KEYCMD		0x0064
 
@@ -120,16 +119,17 @@ struct MOUSE_DEC {
 	int x, y, btn;
 };
 void inthandler2c(int *esp);
-void enable_mouse(struct FIFO32 *fifo, int data0, struct MOUSE_DEC *mdec);
+void enable_mouse(struct MOUSE_DEC *mdec);
 int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
+extern struct FIFO8 mousefifo;
 
 /* memory.c */
-#define MEMMAN_FREES		4090	/* ã“ã‚Œã§ç´„32KB */
+#define MEMMAN_FREES		4090	/* ‚±‚ê‚Å–ñ32KB */
 #define MEMMAN_ADDR			0x003c0000
-struct FREEINFO {	/* ã‚ãæƒ…å ± */
+struct FREEINFO {	/* ‚ ‚«î•ñ */
 	unsigned int addr, size;
 };
-struct MEMMAN {		/* ãƒ¡ãƒ¢ãƒªç®¡ç† */
+struct MEMMAN {		/* ƒƒ‚ƒŠŠÇ— */
 	int frees, maxfrees, lostsize, losts;
 	struct FREEINFO free[MEMMAN_FREES];
 };
@@ -165,20 +165,19 @@ void sheet_free(struct SHEET *sht);
 /* timer.c */
 #define MAX_TIMER		500
 struct TIMER {
-	struct TIMER *next;
 	unsigned int timeout, flags;
-	struct FIFO32 *fifo;
-	int data;
+	struct FIFO8 *fifo;
+	unsigned char data;
 };
 struct TIMERCTL {
-	unsigned int count, next;
-	struct TIMER *t0;
+	unsigned int count, next, using;
+	struct TIMER *timers[MAX_TIMER];
 	struct TIMER timers0[MAX_TIMER];
 };
 extern struct TIMERCTL timerctl;
 void init_pit(void);
 struct TIMER *timer_alloc(void);
 void timer_free(struct TIMER *timer);
-void timer_init(struct TIMER *timer, struct FIFO32 *fifo, int data);
+void timer_init(struct TIMER *timer, struct FIFO8 *fifo, unsigned char data);
 void timer_settime(struct TIMER *timer, unsigned int timeout);
 void inthandler20(int *esp);
