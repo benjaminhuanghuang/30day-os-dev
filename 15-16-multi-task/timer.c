@@ -9,7 +9,12 @@ struct TIMERCTL timerctl;
 #define TIMER_FLAGS_USING 2
 
 void init_pit(void)
-{
+{   /*
+    中断产生的频率是单位时间周期数（主频）/ 设定的数值。
+    比如设定1000, 中断产生的频率就是1.19318KHz
+    Set 11932的话，中断产生的频率大约就是100Hz了，即每10ms发生一次中断。
+    11932换算成十六进制就是0x2e9c
+    */
     int i;
     struct TIMER *t;
     io_out8(PIT_CTRL, 0x34);

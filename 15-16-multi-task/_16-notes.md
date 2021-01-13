@@ -14,3 +14,7 @@ struct FIFO32 {
     struct TASK ＊task;
 };
 ```
+
+## 3 增加窗口数量（harib13c）
+为系统增加更多的任务: 任务A、任务B0、任务B1和任务B2
+
