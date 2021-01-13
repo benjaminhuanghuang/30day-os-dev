@@ -82,6 +82,7 @@ scrn320:
 		MOV		DWORD [VRAM],0x000a0000
 
 ; Ask the BIOS to tell you the LED status of the keyboard.
+keystatus:
   MOV		AH,0x02
   INT		0x16 			; keyboard BIOS
   MOV		[LEDS],AL
