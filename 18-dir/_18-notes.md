@@ -34,3 +34,34 @@ cmdline[30];
 ## 6 cls命令（harib15f）
 
 
+## 7 dir命令（harib15g）
+在磁盘映像中加入了haribote.sys、ipl10.nas和make.bat这3个文件
+
+查看磁盘映像中0x002600字节以后的部分
+
+```
+struct FILEINFO {
+    unsigned char name[8], ext[3], type;
+    char reserve[10];
+    unsigned short time, date, clustno;
+    unsigned int size;
+};
+```
+
+如果文件名的第一个字节为0xe5，代表这个文件已经被删除了
+文件名第一个字节为0x00，代表这一段不包含任何文件名信息。
+
+从磁盘映像的0x004200就开始存放文件haribote.sys了，因此文件信息最多可以存放224个。
+
+
+```
+0x01……只读文件（不可写入）
+0x02……隐藏文件
+0x04……系统文件
+0x08……非文件信息（比如磁盘名称等）
+0x10……目录
+```
+
+#define ADR_DISKIMG		0x00100000
+
+
