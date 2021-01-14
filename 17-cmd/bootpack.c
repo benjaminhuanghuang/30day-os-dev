@@ -59,7 +59,9 @@ void HariMain(void)
 
 	io_out8(PIC0_IMR, 0xf8); /*Allow keyboard, timer PIC (111111000)*/
 	io_out8(PIC1_IMR, 0xef); /*Allow mouse PIC (11101111)*/
-
+	
+	fifo32_init(&keycmd, 32, keycmd_buf, 0);
+	
 	memtotal = memtest(0x00400000, 0xbfffffff);
 	memman_init(memman);
 	memman_free(memman, 0x00001000, 0x0009e000); /* 0x00001000 - 0x0009efff */
@@ -211,7 +213,7 @@ void HariMain(void)
 					sheet_refresh(sht_cons, 0, 0, sht_cons->bxsize, 21);
 				}
 
-								if (i == 256 + 0x2a) {	/* 左シフト ON */
+				if (i == 256 + 0x2a) {	/* 左シフト ON */
 					key_shift |= 1;
 				}
 				if (i == 256 + 0x36) {	/* 右シフト ON */
