@@ -31,4 +31,6 @@ In the console, 将所有的像素向上移动一行
 cmdline[30];
 
 
+## 6 cls命令（harib15f）
+
 
