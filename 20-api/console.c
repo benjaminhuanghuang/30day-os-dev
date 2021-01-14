@@ -2,12 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 
-struct CONSOLE
-{
-	struct SHEET *sht;
-	int cur_x, cur_y, cur_c;
-};
-
 void console_task(struct SHEET *sheet, unsigned int memtotal)
 {
 	struct TIMER *timer;
