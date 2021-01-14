@@ -125,26 +125,6 @@ _load_tr:		; void load_tr(int tr);
 		LTR		[ESP+4]			; tr
 		RET
 
-_asm_inthandler0c:
-        STI
-        PUSH     ES
-        PUSH     DS
-        PUSHAD
-        MOV      EAX, ESP
-        PUSH     EAX
-        MOV      AX, SS
-        MOV      DS, AX
-        MOV      ES, AX
-        CALL     _inthandler0c
-        CMP      EAX,0
-        JNE      end_app
-        POP      EAX
-        POPAD
-        POP      DS
-        POP      ES
-        ADD      ESP,4             ; 在INT 0x0c中也需要这句
-        IRETD
-        
 _asm_inthandler0d:
         STI
         PUSH     ES
