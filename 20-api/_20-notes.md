@@ -38,10 +38,10 @@ _asm_cons_putchar的地址在bootpack.map中
 
 
 ## 3 显示单个字符的API（2）（harib17c）
-这个问题是由于_asm_cons_putchar的RET指令所造成的。普通的RET指令是用于普通的CALL的返回，而不能用于far-CALL的返回，既然我们用了far-CALL，就必须相应地使用far-RET，也就是RETF指令
 
 
 ## 4 结束应用程序（harib17d）
+这个问题是由于_asm_cons_putchar的RET指令所造成的。普通的RET指令是用于普通的CALL的返回，而不能用于far-CALL的返回，既然我们用了far-CALL，就必须相应地使用far-RET，也就是RETF指令
 
 
 ## 5 不随操作系统版本而改变的API（harib17e）
