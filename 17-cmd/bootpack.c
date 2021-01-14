@@ -129,6 +129,10 @@ void HariMain(void)
 					memtotal / (1024 * 1024), memman_total(memman) / 1024);
 	putfonts8_asc_sht(sht_back, 0, 32, COL8_FFFFFF, COL8_008484, s, 40);
 
+	//
+	fifo32_put(&keycmd, KEYCMD_LED);
+	fifo32_put(&keycmd, key_leds);
+
 	for (;;)
 	{
 		if (fifo32_status(&keycmd) > 0 && keycmd_wait < 0) {
@@ -136,7 +140,6 @@ void HariMain(void)
 			wait_KBC_sendready();
 			io_out8(PORT_KEYDAT, keycmd_wait);
 		}
-
 
 		io_cli();
 		if (fifo32_status(&fifo) == 0)
