@@ -288,7 +288,6 @@ _start_app:		; void start_app(int eip, int cs, int esp, int ds, int *tss_esp0); 
       MOV      GS, BX
 
       OR       ECX,3 ; OR 3 to the segment number for the app
-		OR       ECX,3 ; OR 3 into the segment number for the app
 		OR       EBX,3 ; OR 3 into the segment number for the app
 		PUSH     EBX ; SS for app
 		PUSH     EDX ; ESP for app
