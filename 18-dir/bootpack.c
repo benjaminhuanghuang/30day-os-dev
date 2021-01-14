@@ -214,6 +214,14 @@ void HariMain(void)
 						fifo32_put(&task_cons->fifo, 8 + 256);
 					}
 				}
+				if (i == 256 + 0x1c)
+				{ /* Enter */
+					if (key_to != 0)
+					{
+						// send char to console
+						fifo32_put(&task_cons->fifo, 10 + 256);
+					}
+				}
 				if (i == 256 + 0x0f)
 				{ /* Tab */
 					if (key_to == 0)
@@ -468,7 +476,7 @@ void console_task(struct SHEET *sheet)
 {
 	struct TIMER *timer;
 	struct TASK *task = task_now();
-	int i, fifobuf[128], cursor_x = 16, cursor_c = -1;
+	int i, fifobuf[128], cursor_x = 16, cursor_y = 28, cursor_c = -1;
 	char s[2];
 
 	fifo32_init(&task->fifo, 128, fifobuf, task);
@@ -517,7 +525,7 @@ void console_task(struct SHEET *sheet)
 			}
 			if (i == 3)
 			{ /* cursor OFF */
-				boxfill8(sheet->buf, sheet->bxsize, COL8_000000, cursor_x, 28, cursor_x + 7, 43);
+				boxfill8(sheet->buf, sheet->bxsize, COL8_000000, cursor_x, cursor_y, cursor_x + 7, cursor_y + 15);
 				cursor_c = -1;
 			}
 
@@ -529,8 +537,19 @@ void console_task(struct SHEET *sheet)
 					if (cursor_x > 16)
 					{
 						/*用空白擦除光标后将光标前移一位*/
-						putfonts8_asc_sht(sheet, cursor_x, 28, COL8_FFFFFF, COL8_000000, " ", 1);
+						putfonts8_asc_sht(sheet, cursor_x, cursor_y, COL8_FFFFFF, COL8_000000, " ", 1);
 						cursor_x -= 8;
+					}
+				}
+				else if (i == 10 + 256)
+				{
+					/* Enter */
+					if (cursor_y < 28 + 112)
+					{
+						putfonts8_asc_sht(sheet, cursor_x, cursor_y, COL8_FFFFFF, COL8_000000, " ", 1);
+						cursor_y += 16;
+						putfonts8_asc_sht(sheet, 8, cursor_y, COL8_FFFFFF, COL8_000000, ">", 1);
+						cursor_x = 16;
 					}
 				}
 				else
@@ -541,7 +560,7 @@ void console_task(struct SHEET *sheet)
 						/*显示一个字符之后将光标后移一位  */
 						s[0] = i - 256;
 						s[1] = 0;
-						putfonts8_asc_sht(sheet, cursor_x, 28, COL8_FFFFFF, COL8_000000, s, 1);
+						putfonts8_asc_sht(sheet, cursor_x, cursor_y, COL8_FFFFFF, COL8_000000, s, 1);
 						cursor_x += 8;
 					}
 				}
@@ -549,10 +568,10 @@ void console_task(struct SHEET *sheet)
 			/*重新显示光标*/
 			if (cursor_c >= 0)
 			{
-				boxfill8(sheet->buf, sheet->bxsize, cursor_c, cursor_x, 28, cursor_x + 7, 43);
+				boxfill8(sheet->buf, sheet->bxsize, cursor_c, cursor_x, cursor_y, cursor_x + 7, cursor_y + 15);
 			}
 
-			sheet_refresh(sheet, cursor_x, 28, cursor_x + 8, 44);
+			sheet_refresh(sheet, cursor_x, cursor_y, cursor_x + 8, cursor_y + 16);
 		}
 	}
 }
