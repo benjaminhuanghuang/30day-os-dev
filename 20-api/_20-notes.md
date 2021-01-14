@@ -38,6 +38,7 @@ _asm_cons_putchar的地址在bootpack.map中
 
 
 ## 3 显示单个字符的API（2）（harib17c）
+序对API执行CALL的时候，千万不能忘记加上段号。应用程序所在的段为“1003 * 8”，而操作系统所在的段为“2 * 8”，因此我们不能使用普通的CALL，而应该使用far-CALL。
 
 
 ## 4 结束应用程序（harib17d）
