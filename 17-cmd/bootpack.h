@@ -206,6 +206,7 @@ struct TSS32 {
 struct TASK {
     int sel, flags; /* se1用来存放GDT的编号*/
     int level, priority;
+		struct FIFO32 fifo;
     struct TSS32 tss;
 };
 

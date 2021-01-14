@@ -29,6 +29,14 @@ key_to这个变量，用于记录键盘输入（key）应该发送到（to）哪
 
 
 ## 4 实现字符输入（harib14d）
-把struct FIFO放到struct TASK里面
-
+把struct FIFO放到struct TASK里面, 没有什么任务是完全用不到FIFO的
+```
+struct TASK {
+    int sel, flags; 
+    int level, priority;
+    struct FIFO32 fifo;
+    struct TSS32 tss;
+};
+```
+Update main() and console()
 
