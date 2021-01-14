@@ -44,7 +44,10 @@ bootpack.bim : $(OBJS_BOOTPACK) Makefile
 bootpack.hrb : bootpack.bim Makefile
 	$(BIM2HRB) bootpack.bim bootpack.hrb 0
 
-haribote.sys : asmhead.bin bootpack.hrb Makefile
+hlt.hrb : hlt.nas Makefile
+	$(NASK) hlt.nas hlt.hrb hlt.lst
+
+haribote.sys : asmhead.bin bootpack.hrb hlt.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys
 
 haribote.img : boot.bin haribote.sys Makefile
@@ -52,6 +55,7 @@ haribote.img : boot.bin haribote.sys Makefile
 		wbinimg src:boot.bin len:512 from:0 to:0 \
 		copy from:haribote.sys to:@: \
 		copy from:int.c to:@: \
+		copy from:hlt.hrb to:@: \
 		imgout:haribote.img
 
 # general rules
