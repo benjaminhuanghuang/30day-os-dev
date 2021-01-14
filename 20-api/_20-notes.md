@@ -67,3 +67,58 @@ void asm_cons_putchar(void);
 update cons_runcmd in console.c
 
 add cmd_app()
+
+
+## 7 当心寄存器（harib17g）
+Use register in hello.nas
+
+给_asm_cons_putchar添上PUSHAD和POPAD。
+
+
+## 8 用API显示字符串（harib17h）
+显示字符串的API有两种方式：
+一种是显示一串字符，遇到字符编码0则结束；
+另一种是先指定好要显示的字符串的长度再显示
+```
+void cons_putstr0(struct CONSOLE *cons, char *s);
+void cons_putstr1(struct CONSOLE *cons, char *s, int l);
+```
+use cons_putstr0 in console.c
+
+最简单的方法就是像显示单个字符的API那样，分配INT 0x41和INT 0x42来调用这两个函数。不过这样一来，只能设置256个项目的IDT很快就会被用光。
+```
+void hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int eax)
+{
+	struct CONSOLE *cons = (struct CONSOLE *) *((int *) 0x0fec);
+	if (edx == 1) {
+		cons_putchar(cons, eax & 0xff, 1);
+	} else if (edx == 2) {
+		cons_putstr0(cons, (char *) ebx);
+	} else if (edx == 3) {
+		cons_putstr1(cons, (char *) ebx, ecx);
+	}
+	return;
+}
+```
+
+鉴BIOS的调用方式，在寄存器中存入功能号，使得只用1个INT就可以选择调用不同的函数。
+在BIOS中，用来存放功能号的寄存器一般是AH，我们也可以照搬，但这样最多只能设置256个API函数。而如果我们改用EDX来存放功能号，
+```
+功能号1……显示单个字符（AL = 字符编码）
+功能号2……显示字符串0（EBX = 字符串地址）
+功能号3……显示字符串1（EBX = 字符串地址，ECX = 字符串长度）
+```
+还得改一下IDT的设置，将INT 0x40改为调用_asm_hrb_api。
+
+
+Update naskfunc.nas
+```
+  GLOBAL	_asm_hrb_api
+  EXTERN	_hrb_api
+```
+
+
+显示单个字符时，我们用[CS:ECX]的方式特意指定了CS（代码段寄存器），因此可以成功读取msg的内容。但在显示字符串时，由于无法指定段地址，程序误以为是DS而从完全错误的内存地址中读取了内容，碰巧读出的内容是0，于是就什么都没有显示出来。
+
+hrb_api并不知道代码段的起始位置位于内存的哪个地址，但cmd_app应该知道，因为当初设置这个代码段的正是cmd_app。由于我们没有办法从cmd_app向hrb_api直接传递数据，因此只好又在内存里找个地方存放一下了。0xfec这个位置之前已经用过了，这次我们放在它前面的0xfe8好了。
+
