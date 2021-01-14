@@ -4,7 +4,7 @@
 [FILE "a_nask.nas"]
 
         GLOBAL  _api_putchar
-        GLOBAL  _api_end         ; 这里！
+        GLOBAL  _api_end         ;
 
 [SECTION .text]
 

@@ -373,7 +373,7 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
 		cons_newline(cons);
 		return 1;
 	}
-	/* can not fine file. */
+	/* can not find file. */
 	return 0;
 }
 
@@ -385,7 +385,6 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
     if (edx == 1) {
         cons_putchar(cons, eax & 0xff, 1);
     } else if (edx == 2) {
-
         cons_putstr0(cons, (char *) ebx + cs_base);
     } else if (edx == 3) {
         cons_putstr1(cons, (char *) ebx + cs_base, ecx);
