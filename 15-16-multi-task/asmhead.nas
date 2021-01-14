@@ -25,7 +25,7 @@ VRAM	EQU		0x0ff8			; 图形缓冲区起始地址
 
 
   ORG		0xc200			; 
-
+;jmp scrn320
 ; check VBE(VESA BIOS extension)
 
 	MOV		AX,0x9000
