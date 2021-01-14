@@ -7,20 +7,33 @@ void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
 void make_wtitle8(unsigned char *buf, int xsize, char *title, char act);
 void console_task(struct SHEET *sheet);
 
-static char keytable[0x54] = {
+#define KEYCMD_LED		0xed
+
+static char keytable0[0x80] = {
 		0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '^', 0, 0,
 		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '@', '[', 0, 0, 'A', 'S',
-		'D', 'F', 'G', 'H', 'J', 'K', 'L', '; ', ':', 0, 0, ']', 'Z', 'X', 'C', 'V',
-		'B', 'N', 'M', ', ', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+		'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', ':', 0, 0, ']', 'Z', 'X', 'C', 'V',
+		'B', 'N', 'M', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, '7', '8', '9', '-', '4', '5', '6', '+', '1',
-		'2', '3', '0', '.'};
+		'2', '3', '0', '.', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0x5c, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x5c, 0, 0};
+static char keytable1[0x80] = {
+		0, 0, '!', 0x22, '#', '$', '%', '&', 0x27, '(', ')', '~', '=', '~', 0, 0,
+		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '`', '{', 0, 0, 'A', 'S',
+		'D', 'F', 'G', 'H', 'J', 'K', 'L', '+', '*', 0, 0, '}', 'Z', 'X', 'C', 'V',
+		'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, '7', '8', '9', '-', '4', '5', '6', '+', '1',
+		'2', '3', '0', '.', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, '_', 0, 0, 0, 0, 0, 0, 0, 0, 0, '|', 0, 0};
 
 void HariMain(void)
 {
 	struct BOOTINFO *binfo = (struct BOOTINFO *)ADR_BOOTINFO;
 	// keyboard, mouse, timer use same fifo
-	struct FIFO32 fifo;
-	int fifobuf[128];
+	struct FIFO32 fifo, keycmd;
+	int fifobuf[128], keycmd_buf[32];
 
 	char s[40];
 
@@ -33,12 +46,13 @@ void HariMain(void)
 	struct SHEET *sht_back, *sht_mouse, *sht_win, *sht_cons;
 	struct TASK *task_a, *task_cons;
 	struct TIMER *timer;
-	int key_to = 0;
-
+	int key_to = 0, key_shift = 0, key_leds = (binfo->leds >> 4) & 7, keycmd_wait = -1;
+	
 	init_gdtidt();
 	init_pic();
 	io_sti(); // disable CPU interrupt.
 	fifo32_init(&fifo, 128, fifobuf, 0);
+	fifo32_init(&keycmd, 32, fifobuf, 0);
 	init_pit();
 	init_keyboard(&fifo, 256);
 	enable_mouse(&fifo, 512, &mdec);
@@ -117,6 +131,13 @@ void HariMain(void)
 
 	for (;;)
 	{
+		if (fifo32_status(&keycmd) > 0 && keycmd_wait < 0) {
+			keycmd_wait = fifo32_get(&keycmd);
+			wait_KBC_sendready();
+			io_out8(PORT_KEYDAT, keycmd_wait);
+		}
+
+
 		io_cli();
 		if (fifo32_status(&fifo) == 0)
 		{
@@ -132,39 +153,43 @@ void HariMain(void)
 				// keyboard data
 				sprintf(s, "%02X", i - 256);
 				putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF, COL8_008484, s, 2);
-				if (i < 0x54 + 256 && keytable[i - 256] != 0)
-				{
-					if (key_to == 0)
-					{
-						if (cursor_x < 128)
-						{
-							s[0] = keytable[i - 256];
+				if (i < 0x80 + 256) { /* Convert keycode to character code */
+					if (key_shift == 0) {
+						s[0] = keytable0[i - 256];
+					} else {
+						s[0] = keytable1[i - 256];
+					}
+				} else {
+					s[0] = 0;
+				}
+				if ('A' <= s[0] && s[0] <= 'Z') {	/* alphabet */
+					if (((key_leds & 4) == 0 && key_shift == 0) ||
+							((key_leds & 4) != 0 && key_shift != 0)) {
+						s[0] += 0x20;	/* uppercase  */
+					}
+				}
+
+				if (s[0] != 0) { /* text */
+					if (key_to == 0) {
+						if (cursor_x < 128) {
 							s[1] = 0;
 							putfonts8_asc_sht(sht_win, cursor_x, 28, COL8_000000, COL8_FFFFFF, s, 1);
 							cursor_x += 8;
 						}
-					}
-					else
-					{
-						fifo32_put(&task_cons->fifo, keytable[i - 256] + 256);
+					} else {	
+						fifo32_put(&task_cons->fifo, s[0] + 256);
 					}
 				}
-				if (i == 256 + 0x0e && cursor_x > 8)
-				{ /* backspace */
-					if (key_to == 0)
-					{
-						if (cursor_x > 8)
-						{
+				if (i == 256 + 0x0e) {	/* backspace */
+					if (key_to == 0) {	
+						if (cursor_x > 8) {
 							putfonts8_asc_sht(sht_win, cursor_x, 28, COL8_000000, COL8_FFFFFF, " ", 1);
 							cursor_x -= 8;
 						}
-					}
-					else
-					{
+					} else {	
 						fifo32_put(&task_cons->fifo, 8 + 256);
 					}
 				}
-
 				if (i == 256 + 0x0f)
 				{ /* Tab */
 					if (key_to == 0)
@@ -181,6 +206,41 @@ void HariMain(void)
 					}
 					sheet_refresh(sht_win, 0, 0, sht_win->bxsize, 21);
 					sheet_refresh(sht_cons, 0, 0, sht_cons->bxsize, 21);
+				}
+
+								if (i == 256 + 0x2a) {	/* 左シフト ON */
+					key_shift |= 1;
+				}
+				if (i == 256 + 0x36) {	/* 右シフト ON */
+					key_shift |= 2;
+				}
+				if (i == 256 + 0xaa) {	/* 左シフト OFF */
+					key_shift &= ~1;
+				}
+				if (i == 256 + 0xb6) {	/* 右シフト OFF */
+					key_shift &= ~2;
+				}
+				if (i == 256 + 0x3a) {	/* CapsLock */
+					key_leds ^= 4;
+					fifo32_put(&keycmd, KEYCMD_LED);
+					fifo32_put(&keycmd, key_leds);
+				}
+				if (i == 256 + 0x45) {	/* NumLock */
+					key_leds ^= 2;
+					fifo32_put(&keycmd, KEYCMD_LED);
+					fifo32_put(&keycmd, key_leds);
+				}
+				if (i == 256 + 0x46) {	/* ScrollLock */
+					key_leds ^= 1;
+					fifo32_put(&keycmd, KEYCMD_LED);
+					fifo32_put(&keycmd, key_leds);
+				}
+				if (i == 256 + 0xfa) {	/* The keyboard received the data successfully. */
+					keycmd_wait = -1;
+				}
+				if (i == 256 + 0xfe) {	/* The keyboard did not receive the data safely. */
+					wait_KBC_sendready();
+					io_out8(PORT_KEYDAT, keycmd_wait);
 				}
 				/* draw the cursor */
 				boxfill8(sht_win->buf, sht_win->bxsize, cursor_c, cursor_x, 28, cursor_x + 7, 43);
