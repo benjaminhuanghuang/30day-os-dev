@@ -39,6 +39,9 @@ JMP DWORD 2＊8:0x0000001b
         CALL     0x1b
         RETF
 ```
+需要把hrb文件的开头的6个字节替换成“E8 16 00 00 00 CB”
+
+凡是通过bim2hrb生成的hrb文件，其第4～7字节一定为“Hari”，因此程序通过判断第4～7字节的内容，将读取的数据先进行修改之后再运行。
 
 make file
 ```
@@ -48,7 +51,32 @@ a.bim : a.obj a_nask.obj Makefile
 a.hrb : a.bim Makefile
     $(BIM2HRB) a.bim a.hrb 0
 ```
-凡是通过bim2hrb生成的hrb文件，其第4～7字节一定为“Hari”，因此程序通过判断第4～7字节的内容，将读取的数据先进行修改之后再运行。这样一来，不需要用二进制编辑器手工修改，程序应该也可以正常运行了
 
 
-## 
+## 3 保护操作系统（1）（harib18c）
+```
+void HariMain(void)
+{
+    ＊((char ＊) 0x00102600) = 0;
+    return;
+}
+```
+
+## 4 保护操作系统（2）（harib18d）
+
+crack app 擅自访问了本该由操作系统来管理的内存空间。
+
+需要为应用程序提供专用的内存空间，并且告诉它们“别的地方不许碰哦”。
+要做到这一点，我们可以创建应用程序专用的数据段，并在应用程序运行期间，将DS和SS指向该段地址。
+操作系统用代码段……2 ＊ 8
+操作系统用数据段……1 ＊ 8
+应用程序用代码段……1003 ＊ 8
+应用程序用数据段……1004 ＊ 8
+（3 ＊ 8～1002 ＊ 8为TSS所使用的段）
+
+update cmd_app()
+
+add asm function
+```
+	void start_app(int eip, int cs, int esp, int ds);
+```
