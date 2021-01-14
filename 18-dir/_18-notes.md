@@ -20,3 +20,15 @@
     }
 ```
 修改接收数据的console_task。之前已经有了一个cursor_x变量，再创建一个cursor_y变量，当按下回车键时，将cursor_y加1就可以
+
+
+## 4 对窗口滚动的支持（harib15d）
+
+In the console, 将所有的像素向上移动一行
+
+## 5 mem命令（harib15e）
+
+cmdline[30];
+
+
+
