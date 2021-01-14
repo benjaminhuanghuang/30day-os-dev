@@ -200,7 +200,8 @@ struct TSS32 {
 	int ldtr, iomap;
 };
 struct TASK {
-	int sel, flags; /* selector index */
+	int sel, flags; /* GDT selector index */
+	int priority;  
 	struct TSS32 tss;
 };
 struct TASKCTL {
@@ -212,7 +213,7 @@ struct TASKCTL {
 extern struct TIMER *task_timer;
 struct TASK *task_init(struct MEMMAN *memman);
 struct TASK *task_alloc(void);
-void task_run(struct TASK *task);
+void task_run(struct TASK *task, int priority);
 void task_switch(void);
 void task_sleep(struct TASK *task);
 

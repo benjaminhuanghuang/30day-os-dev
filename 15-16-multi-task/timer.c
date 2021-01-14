@@ -89,7 +89,6 @@ void timer_settime(struct TIMER *timer, unsigned int timeout)
         {
             /* 插入s和t之间的情况 */
             s->next = timer; /* s下一个是timer */
-
             timer->next = t; /* timer的下一个是t */
             io_store_eflags(e);
             return;
