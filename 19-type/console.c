@@ -191,10 +191,10 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 							p = (char *) memman_alloc_4k(memman, finfo[x].size);
 							file_loadfile(finfo[x].clustno, finfo[x].size, p, fat, (char *) (ADR_DISKIMG + 0x003e00));
 							cursor_x = 8;
-							for (x = 0; x < y; x++)
+							for (y = 0; y < finfo[x].size; y++)
 							{
 								/* byte by byte */
-								s[0] = p[x];
+								s[0] = p[y];
 								s[1] = 0;
 								if (s[0] == 0x09)
 								{ /* tab */
