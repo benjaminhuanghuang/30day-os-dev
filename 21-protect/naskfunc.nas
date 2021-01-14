@@ -12,6 +12,7 @@
    GLOBAL	_load_tr
    GLOBAL	_asm_inthandler20, _asm_inthandler21
    GLOBAL	_asm_inthandler27, _asm_inthandler2c
+   GLOBAL	_asm_inthandler0d
    GLOBAL	_memtest_sub
    GLOBAL	_farjmp, _farcall
    GLOBAL	_asm_hrb_api, _start_app
@@ -269,26 +270,25 @@ _asm_hrb_api:
 
 end_app:
 ; EAX is the number of tss.esp0
-		MOV ESP,[EAX].
+		MOV ESP,[EAX]
 		POPAD
 		RET ; return to cmd_app
 
-_start_app:		; void start_app(int eip, int cs, int esp, int ds, int *tss_esp0);      PUSHAD       ; 将32位寄存器的值全部保存起来
-      PUSHAD
+_start_app:		; void start_app(int eip, int cs, int esp, int ds, int *tss_esp0);      
+      PUSHAD                     ; 将32位寄存器的值全部保存起来
       MOV      EAX, [ESP+36]     ; 应用程序用EIP
       MOV      ECX, [ESP+40]     ; 应用程序用CS
       MOV      EDX, [ESP+44]     ; 应用程序用ESP
       MOV      EBX, [ESP+48]     ; 应用程序用DS/SS
       MOV      EBX, [ESP+52]     ; tss.esp0
-      MOV      [EBP], ESP      ; 操作系统用ESP
-      MOV      [EBP+4], SS      ; 操作系统用SS
+      MOV      [EBP], ESP        ; 操作系统用ESP
+      MOV      [EBP+4], SS       ; 操作系统用SS
       MOV      ES, BX
       MOV      DS, BX
       MOV      FS, BX
       MOV      GS, BX
-
-      OR       ECX,3 ; OR 3 to the segment number for the app
-		OR       EBX,3 ; OR 3 into the segment number for the app
+      OR       ECX, 3 ; OR 3 to the segment number for the app
+		OR       EBX, 3 ; OR 3 into the segment number for the app
 		PUSH     EBX ; SS for app
 		PUSH     EDX ; ESP for app
 		PUSH     ECX ; CS for app
