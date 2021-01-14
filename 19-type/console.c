@@ -12,11 +12,14 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 	struct MEMMAN *memman = (struct MEMMAN *)MEMMAN_ADDR;
 	int x, y;
 	struct FILEINFO *finfo = (struct FILEINFO *)(ADR_DISKIMG + 0x002600);
+	int *fat = (int *) memman_alloc_4k(memman, 4 * 2880);
 
 	fifo32_init(&task->fifo, 128, fifobuf, task);
 	timer = timer_alloc();
 	timer_init(timer, &task->fifo, 1);
 	timer_settime(timer, 50);
+	file_readfat(fat, (unsigned char *) (ADR_DISKIMG + 0x000200));
+
 
 	/*显示提示符*/
 	putfonts8_asc_sht(sheet, 8, 28, COL8_FFFFFF, COL8_000000, ">", 1);
@@ -185,8 +188,8 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 						if (x < 224 && finfo[x].name[0] != 0x00)
 						{
 							/* file is found */
-							y = finfo[x].size;
-							p = (char *)(finfo[x].clustno * 512 + 0x003e00 + ADR_DISKIMG);
+							p = (char *) memman_alloc_4k(memman, finfo[x].size);
+							file_loadfile(finfo[x].clustno, finfo[x].size, p, fat, (char *) (ADR_DISKIMG + 0x003e00));
 							cursor_x = 8;
 							for (x = 0; x < y; x++)
 							{
