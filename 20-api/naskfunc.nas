@@ -232,9 +232,9 @@ _farcall:		; void farcall(int eip, int cs);
 _asm_cons_putchar:
 		STI
 		PUSH	1
-		AND		EAX,0xff	; AHやEAXの上位を0にして、EAXに文字コードが入った状態にする。
+		AND		EAX,0xff	; 
 		PUSH	EAX
-		PUSH	DWORD [0x0fec]	; メモリの内容を読み込んでその値をPUSHする
+		PUSH	DWORD [0x0fec]	; read memory and push
 		CALL	_cons_putchar
-		ADD		ESP,12		; スタックに積んだデータを捨てる
+		ADD		ESP,12		; drop the data in stack
 		IRETD
