@@ -80,3 +80,51 @@ add asm function
 ```
 	void start_app(int eip, int cs, int esp, int ds);
 ```
+
+## 5 对异常的支持（harib18e）
+要想强制结束程序，只要在中断号0x0d中注册一个函数即可，这是因为在x86架构规范中，当应用程序试图破坏操作系统，或者试图违背操作系统的设置时，就会自动产生0x0d中断，因此该中断也被称为“异常”。
+
+create _asm_inthandler0d
+
+将_asm_inthandler0d注册到IDT中
+
+## 6 保护操作系统（3）（harib18f）
+
+如果忽略操作系统指定的DS，而是用汇编语言直接将操作系统用的段地址存入DS的话，就又可以干坏事了
+```
+[INSTRSET "i486p"]
+[BITS 32]
+        MOV      EAX,1＊8          ; OS用的段号
+        MOV      DS, AX             ; 将其存入DS
+        MOV      BYTE [0x102600],0
+        RETF
+```
+
+## 7 保护操作系统（4）（harib18g）
+
+在段定义的地方，如果将访问权限加上0x60的话，就可以将段设置为应用程序用。
+当CS中的段地址为应用程序用段地址时，CPU会认为“当前正在运行应用程序”，这时如果存入操作系统用的段地址就会产生异常。
+
+Change cmd_app
+```
+	struct TASK *task = task_now();
+	set_segmdesc(gdt + 1003, finfo->size - 1, (int) p, AR_CODE32_ER + 0x60);
+	set_segmdesc(gdt + 1004, 64 * 1024 - 1,   (int) q, AR_DATA32_RW + 0x60);
+		...
+	start_app(0, 1003 * 8, 64 * 1024, 1004 * 8, &(task->tss.esp0));
+
+```
+change naskfunc.nas
+```
+	_start_app:		; void start_app(int eip, int cs, int esp, int ds, int *tss_esp0);
+```
+
+在启动应用程序的时候我们需要让“操作系统向应用程序用的段执行far-CALL”，但根据x86的规则，是不允许操作系统CALL应用程序的（如果强行CALL的话会产生异常）。可能有人会想如果CALL不行的话JMP总可以吧，但在x86中“操作系统向应用程序用的段进行far-JMP”也是被禁止的。
+
+之前我们一直讲RETF是当far-CALL调用后进行返回的指令，其实即便没有被CALL调用，也可以进行RETF。说穿了，RETF的本质就是从栈中将地址POP出来，然后JMP到该地址而已。因此正如这次我们所做的一样，可以用RETF来代替far-JMP的功能。
+
+修改一下IDT的设置。在我们已经清晰地区分操作系统段和应用程序段的情况下，当应用程序试图调用未经操作系统授权的中断时，CPU会认为“这家伙乱用奇怪的中断号，想把操作系统搞坏，是坏人”，并产生异常。因此，我们需要在IDT中将INT 0x40设置为“可供应用程序作为API来调用的中断”。
+
+
+应用程序也需要修改一下，因为已经不能通过RETF来结束程序了
+

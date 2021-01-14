@@ -17,6 +17,7 @@
    GLOBAL	_asm_hrb_api, _start_app
    EXTERN	_inthandler20, _inthandler21
    EXTERN	_inthandler27, _inthandler2c
+   EXTERN	_inthandler0d
    EXTERN	_hrb_api
 
 
@@ -123,22 +124,41 @@ _load_tr:		; void load_tr(int tr);
 		LTR		[ESP+4]			; tr
 		RET
 
+_asm_inthandler0d:
+        STI
+        PUSH     ES
+        PUSH     DS
+        PUSHAD
+        MOV      EAX, ESP
+        PUSH     EAX
+        MOV      AX, SS
+        MOV      DS, AX
+        MOV      ES, AX
+        CALL     _inthandler0d
+        CMP      EAX,0        ; 只有这里不同
+        JNE      end_app      ; 只有这里不同
+        POP      EAX
+        POPAD
+        POP      DS
+        POP      ES
+        ADD      ESP,4             ; 在INT 0x0d中需要这句
+        IRETD
 
 _asm_inthandler20:
-		PUSH	ES
-		PUSH	DS
-		PUSHAD
-		MOV		EAX,ESP
-		PUSH	EAX
-		MOV		AX,SS
-		MOV		DS,AX
-		MOV		ES,AX
-		CALL	_inthandler20
-		POP		EAX
-		POPAD
-		POP		DS
-		POP		ES
-		IRETD
+        PUSH     ES
+        PUSH     DS
+        PUSHAD
+        MOV      EAX, ESP
+        PUSH     EAX
+        MOV      AX, SS
+        MOV      DS, AX
+        MOV      ES, AX
+        CALL     _inthandler20
+        POP      EAX
+        POPAD
+        POP      DS
+        POP      ES
+        IRETD
 
 _asm_inthandler21:
    PUSH	ES
@@ -230,82 +250,48 @@ _farcall:		; void farcall(int eip, int cs);
 		RET
 
 _asm_hrb_api:
-      ; 为方便起见从开头就禁止中断请求
-      PUSH     DS
-      PUSH     ES
-      PUSHAD       ; 用于保存的PUSH
-      MOV      EAX,1＊8
-      MOV      DS, AX             ; 先仅将DS设定为操作系统用
-      MOV      ECX, [0xfe4]      ; 操作系统的ESP
-      ADD      ECX, -40
-      MOV      [ECX+32], ESP     ; 保存应用程序的ESP
-      MOV      [ECX+36], SS      ; 保存应用程序的SS
+		STI
+		PUSH     DS
+		PUSH     ES
+		PUSHAD ; PUSH for storage
+		PUSHAD ; PUSH to pass to hrb_api
+		MOV AX,SS
+		MOV DS,AX ; put segments for OS into DS and ES
+		MOV ES,AX
+		CALL _hrb_api
+		CMP EAX,0 ; end app if EAX is not 0
+		JNE end_app
+		ADD ESP,32
+		POPAD
+		POP ES
+		POP DS
+		IRETD
 
-; 将PUSHAD后的值复制到系统栈
+end_app:
+; EAX is the number of tss.esp0
+		MOV ESP,[EAX].
+		POPAD
+		RET ; return to cmd_app
 
-      MOV      EDX, [ESP   ]
-      MOV      EBX, [ESP+ 4]
-      MOV      [ECX   ], EDX     ; 复制传递给hrb_api
-      MOV      [ECX+ 4], EBX     ; 复制传递给hrb_api
-      MOV      EDX, [ESP+ 8]
-      MOV      EBX, [ESP+12]
-      MOV      [ECX+ 8], EDX     ; 复制传递给hrb_api
-      MOV      [ECX+12], EBX     ; 复制传递给hrb_api
-      MOV      EDX, [ESP+16]
-      MOV      EBX, [ESP+20]
-      MOV      [ECX+16], EDX     ; 复制传递给hrb_api
-      MOV      [ECX+20], EBX     ; 复制传递给hrb_api
-      MOV      EDX, [ESP+24]
-      MOV      EBX, [ESP+28]
-      MOV      [ECX+24], EDX     ; 复制传递给hrb_api
-      MOV      [ECX+28], EBX     ; 复制传递给hrb_api
-
-      MOV      ES, AX             ; 将剩余的段寄存器也设为操作系统用
-      MOV      SS, AX
-      MOV      ESP, ECX
-      STI          ; 恢复中断请求
-
-      CALL     _hrb_api
-
-      MOV      ECX, [ESP+32]     ; 取出应用程序的ESP
-      MOV      EAX, [ESP+36]     ; 取出应用程序的SS
-      CLI
-      MOV      SS, AX
-      MOV      ESP, ECX
-      POPAD
-      POP      ES
-      POP      DS
-      IRETD        ; 这个命令会自动执行STI
-
-_start_app:      ; void start_app(int eip, int cs, int esp, int ds);
-      PUSHAD       ; 将32位寄存器的值全部保存起来
+_start_app:		; void start_app(int eip, int cs, int esp, int ds, int *tss_esp0);      PUSHAD       ; 将32位寄存器的值全部保存起来
+      PUSHAD
       MOV      EAX, [ESP+36]     ; 应用程序用EIP
       MOV      ECX, [ESP+40]     ; 应用程序用CS
       MOV      EDX, [ESP+44]     ; 应用程序用ESP
       MOV      EBX, [ESP+48]     ; 应用程序用DS/SS
-      MOV      [0xfe4], ESP      ; 操作系统用ESP
-      CLI          ; 在切换过程中禁止中断请求
+      MOV      EBX, [ESP+52]     ; tss.esp0
+      MOV      [EBP], ESP      ; 操作系统用ESP
+      MOV      [EBP+4], SS      ; 操作系统用SS
       MOV      ES, BX
-      MOV      SS, BX
       MOV      DS, BX
       MOV      FS, BX
       MOV      GS, BX
-      MOV      ESP, EDX
-      STI          ; 切换完成后恢复中断请求
-      PUSH     ECX               ; 用于far-CALL的PUSH(cs)
-      PUSH     EAX               ; 用于far-CALL的PUSH(eip)
-      CALL     FAR [ESP]        ; 调用应用程序
 
-;   应用程序结束后返回此处
-
-      MOV      EAX,1＊8          ; 操作系统用DS/SS
-      CLI          ; 再次进行切换，禁止中断请求
-      MOV      ES, AX
-      MOV      SS, AX
-      MOV      DS, AX
-      MOV      FS, AX
-      MOV      GS, AX
-      MOV      ESP, [0xfe4]
-      STI          ; 切换完成后恢复中断请求
-      POPAD   ; 恢复之前保存的寄存器值
-      RET
+      OR       ECX,3 ; OR 3 to the segment number for the app
+		OR       ECX,3 ; OR 3 into the segment number for the app
+		OR       EBX,3 ; OR 3 into the segment number for the app
+		PUSH     EBX ; SS for app
+		PUSH     EDX ; ESP for app
+		PUSH     ECX ; CS for app
+		PUSH     EAX ; EIP for app
+		RETF
