@@ -61,3 +61,9 @@ void farjmp(int eip, int cs);
 void farcall(int eip, int cs);
 void asm_cons_putchar(void);
 ```
+
+## 6 为应用程序自由命名（harib17f）
+
+update cons_runcmd in console.c
+
+add cmd_app()
