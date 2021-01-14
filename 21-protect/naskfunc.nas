@@ -280,7 +280,7 @@ _start_app:		; void start_app(int eip, int cs, int esp, int ds, int *tss_esp0);
       MOV      ECX, [ESP+40]     ; 应用程序用CS
       MOV      EDX, [ESP+44]     ; 应用程序用ESP
       MOV      EBX, [ESP+48]     ; 应用程序用DS/SS
-      MOV      EBX, [ESP+52]     ; tss.esp0
+      MOV      EBP, [ESP+52]     ; tss.esp0
       MOV      [EBP], ESP        ; 操作系统用ESP
       MOV      [EBP+4], SS       ; 操作系统用SS
       MOV      ES, BX
