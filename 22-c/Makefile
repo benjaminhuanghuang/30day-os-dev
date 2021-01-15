@@ -59,14 +59,21 @@ bug1.bim : bug1.obj Makefile
 bug1.hrb : bug1.bim Makefile
 	$(BIM2HRB) bug1.bim bug1.hrb 0
 
+bug3.bim : bug3.obj Makefile
+	$(OBJ2BIM) @$(RULEFILE) out:bug3.bim map:bug3.map bug3.obj a_nask.obj
+
+bug3.hrb : bug3.bim Makefile
+	$(BIM2HRB) bug3.bim bug3.hrb 0
+
 haribote.img : boot.bin haribote.sys Makefile \
-		hello.hrb bug1.hrb 
+		hello.hrb bug1.hrb bug3.hrb
 	$(EDIMG)   imgin:../z_tools/fdimg0at.tek \
 		wbinimg src:boot.bin len:512 from:0 to:0 \
 		copy from:haribote.sys to:@: \
 		copy from:int.c to:@: \
 		copy from:hello.hrb to:@: \
 		copy from:bug1.hrb to:@: \
+		copy from:bug3.hrb to:@: \
 		imgout:haribote.img
 
 # general rules
