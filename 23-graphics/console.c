@@ -331,6 +331,8 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
 	char name[18], *p, *q;
 	struct TASK *task = task_now();
 	int i, segsiz, datsiz, esp, dathrb;
+	struct SHTCTL *shtctl;
+	struct SHEET *sht;
 
 	/* get file name from command */
 	for (i = 0; i < 13; i++)
@@ -378,6 +380,16 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
 				q[esp + i] = p[dathrb + i];
 			}
 			start_app(0x1b, 1003 * 8, esp, 1004 * 8, &(task->tss.esp0));
+			shtctl = (struct SHTCTL *)*((int *)0x0fe4);
+			for (i = 0; i < MAX_SHEETS; i++)
+			{
+				sht = &(shtctl->sheets0[i]);
+				if (sht->flags != 0 && sht->task == task)
+				{
+					sheet_free(sht); /* close */
+				}
+			}
+
 			memman_free_4k(memman, (int)q, segsiz);
 		}
 		else
@@ -405,7 +417,6 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 	/* reg[4] : EBX, reg[5] : EDX, reg[6] : ECX, reg[7] : EAX */
 	int i;
 
-
 	if (edx == 1)
 	{
 		cons_putchar(cons, eax & 0xff, 1);
@@ -425,6 +436,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 	else if (edx == 5)
 	{
 		sht = sheet_alloc(shtctl);
+		sht->task = task;
 		sheet_setbuf(sht, (char *)ebx + ds_base, esi, edi, eax);
 		make_window8((char *)ebx + ds_base, esi, edi, (char *)ecx + ds_base, 0);
 		sheet_slide(sht, 100, 50);
@@ -433,7 +445,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 	}
 	else if (edx == 6)
 	{
-		sht = (struct SHEET *) (ebx & 0xfffffffe);
+		sht = (struct SHEET *)(ebx & 0xfffffffe);
 		putfonts8_asc(sht->buf, sht->bxsize, esi, edi, eax, (char *)ebp + ds_base);
 		if ((edx & 1) == 0)
 		{
@@ -442,11 +454,11 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 	}
 	else if (edx == 7)
 	{
-		sht = (struct SHEET *) (ebx & 0xfffffffe);
+		sht = (struct SHEET *)(ebx & 0xfffffffe);
 		boxfill8(sht->buf, sht->bxsize, ebp, eax, ecx, esi, edi);
 		if ((edx & 1) == 0)
 		{
-		sheet_refresh(sht, eax, ecx, esi + 1, edi + 1);
+			sheet_refresh(sht, eax, ecx, esi + 1, edi + 1);
 		}
 	}
 	else if (edx == 8)
@@ -467,11 +479,11 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 	}
 	else if (edx == 11)
 	{
-		sht = (struct SHEET *) (ebx & 0xfffffffe);
+		sht = (struct SHEET *)(ebx & 0xfffffffe);
 		sht->buf[sht->bxsize * edi + esi] = eax;
 		if ((edx & 1) == 0)
 		{
-		sheet_refresh(sht, esi, edi, esi + 1, edi + 1);
+			sheet_refresh(sht, esi, edi, esi + 1, edi + 1);
 		}
 	}
 	else if (edx == 12)
@@ -479,21 +491,32 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 		sht = (struct SHEET *)ebx;
 		sheet_refresh(sht, eax, ecx, esi, edi);
 	}
-	else if (edx == 13) {
-		sht = (struct SHEET *) (ebx & 0xfffffffe);
+	else if (edx == 13)
+	{
+		sht = (struct SHEET *)(ebx & 0xfffffffe);
 		hrb_api_linewin(sht, eax, ecx, esi, edi, ebp);
-		if ((ebx & 1) == 0) {
+		if ((ebx & 1) == 0)
+		{
 			sheet_refresh(sht, eax, ecx, esi + 1, edi + 1);
 		}
-	}else if (edx == 14) {
-		sheet_free((struct SHEET *) ebx);
-	} else if (edx == 15) {
-		for (;;) {
+	}
+	else if (edx == 14)
+	{
+		sheet_free((struct SHEET *)ebx);
+	}
+	else if (edx == 15)
+	{
+		for (;;)
+		{
 			io_cli();
-			if (fifo32_status(&task->fifo) == 0) {
-				if (eax != 0) {
-					task_sleep(task);	/* FIFO is empty, sleep */
-				} else {
+			if (fifo32_status(&task->fifo) == 0)
+			{
+				if (eax != 0)
+				{
+					task_sleep(task); /* FIFO is empty, sleep */
+				}
+				else
+				{
 					io_sti();
 					reg[7] = -1;
 					return 0;
@@ -501,18 +524,22 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 			}
 			i = fifo32_get(&task->fifo);
 			io_sti();
-			if (i <= 1) { /* cursor timer */
+			if (i <= 1)
+			{ /* cursor timer */
 				/*  */
 				timer_init(cons->timer, &task->fifo, 1); /*next time = 1 */
 				timer_settime(cons->timer, 50);
 			}
-			if (i == 2) {	/* cursor ON */
+			if (i == 2)
+			{ /* cursor ON */
 				cons->cur_c = COL8_FFFFFF;
 			}
-			if (i == 3) {	/* cursor OFF */
+			if (i == 3)
+			{ /* cursor OFF */
 				cons->cur_c = -1;
 			}
-			if (256 <= i && i <= 511) { /* keyborad data, from task_a */
+			if (256 <= i && i <= 511)
+			{ /* keyborad data, from task_a */
 				reg[7] = i - 256;
 				return 0;
 			}
@@ -553,39 +580,57 @@ void hrb_api_linewin(struct SHEET *sht, int x0, int y0, int x1, int y1, int col)
 	dy = y1 - y0;
 	x = x0 << 10;
 	y = y0 << 10;
-	if (dx < 0) {
-		dx = - dx;
+	if (dx < 0)
+	{
+		dx = -dx;
 	}
-	if (dy < 0) {
-		dy = - dy;
+	if (dy < 0)
+	{
+		dy = -dy;
 	}
-	if (dx >= dy) {
+	if (dx >= dy)
+	{
 		len = dx + 1;
-		if (x0 > x1) {
+		if (x0 > x1)
+		{
 			dx = -1024;
-		} else {
-			dx =  1024;
 		}
-		if (y0 <= y1) {
+		else
+		{
+			dx = 1024;
+		}
+		if (y0 <= y1)
+		{
 			dy = ((y1 - y0 + 1) << 10) / len;
-		} else {
+		}
+		else
+		{
 			dy = ((y1 - y0 - 1) << 10) / len;
 		}
-	} else {
+	}
+	else
+	{
 		len = dy + 1;
-		if (y0 > y1) {
+		if (y0 > y1)
+		{
 			dy = -1024;
-		} else {
-			dy =  1024;
 		}
-		if (x0 <= x1) {
+		else
+		{
+			dy = 1024;
+		}
+		if (x0 <= x1)
+		{
 			dx = ((x1 - x0 + 1) << 10) / len;
-		} else {
+		}
+		else
+		{
 			dx = ((x1 - x0 - 1) << 10) / len;
 		}
 	}
 
-	for (i = 0; i < len; i++) {
+	for (i = 0; i < len; i++)
+	{
 		sht->buf[(y >> 10) * sht->bxsize + (x >> 10)] = col;
 		x += dx;
 		y += dy;
