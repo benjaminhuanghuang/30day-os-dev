@@ -4,7 +4,6 @@
 
 void console_task(struct SHEET *sheet, unsigned int memtotal)
 {
-	struct TIMER *timer;
 	struct TASK *task = task_now();
 	struct MEMMAN *memman = (struct MEMMAN *)MEMMAN_ADDR;
 	int i, fifobuf[128], *fat = (int *)memman_alloc_4k(memman, 4 * 2880);
@@ -17,9 +16,9 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 	*((int *)0x0fec) = (int)&cons;
 
 	fifo32_init(&task->fifo, 128, fifobuf, task);
-	timer = timer_alloc();
-	timer_init(timer, &task->fifo, 1);
-	timer_settime(timer, 50);
+	cons.timer = timer_alloc();
+	timer_init(cons.timer, &task->fifo, 1);
+	timer_settime(cons.timer, 50);
 	file_readfat(fat, (unsigned char *)(ADR_DISKIMG + 0x000200));
 
 	/*显示提示符*/
@@ -41,7 +40,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 			{ /*光标用定时器*/
 				if (i != 0)
 				{
-					timer_init(timer, &task->fifo, 0); /*下次置0 */
+					timer_init(cons.timer, &task->fifo, 0); /*下次置0 */
 					if (cons.cur_c >= 0)
 					{
 						cons.cur_c = COL8_FFFFFF;
@@ -49,13 +48,13 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 				}
 				else
 				{
-					timer_init(timer, &task->fifo, 1); /*下次置1 */
+					timer_init(cons.timer, &task->fifo, 1); /*下次置1 */
 					if (cons.cur_c >= 0)
 					{
 						cons.cur_c = COL8_000000;
 					}
 				}
-				timer_settime(timer, 50);
+				timer_settime(cons.timer, 50);
 			}
 			if (i == 2)
 			{ /*光标ON */
@@ -404,6 +403,8 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 	/* Forcibly rewrite PUSHAD for storage */
 	/* reg[0] : EDI, reg[1] : ESI, reg[2] : EBP, reg[3] : ESP */
 	/* reg[4] : EBX, reg[5] : EDX, reg[6] : ECX, reg[7] : EAX */
+	int i;
+
 
 	if (edx == 1)
 	{
@@ -484,7 +485,40 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 		if ((ebx & 1) == 0) {
 			sheet_refresh(sht, eax, ecx, esi + 1, edi + 1);
 		}
+	}else if (edx == 14) {
+		sheet_free((struct SHEET *) ebx);
+	} else if (edx == 15) {
+		for (;;) {
+			io_cli();
+			if (fifo32_status(&task->fifo) == 0) {
+				if (eax != 0) {
+					task_sleep(task);	/* FIFO is empty, sleep */
+				} else {
+					io_sti();
+					reg[7] = -1;
+					return 0;
+				}
+			}
+			i = fifo32_get(&task->fifo);
+			io_sti();
+			if (i <= 1) { /* cursor timer */
+				/*  */
+				timer_init(cons->timer, &task->fifo, 1); /*next time = 1 */
+				timer_settime(cons->timer, 50);
+			}
+			if (i == 2) {	/* cursor ON */
+				cons->cur_c = COL8_FFFFFF;
+			}
+			if (i == 3) {	/* cursor OFF */
+				cons->cur_c = -1;
+			}
+			if (256 <= i && i <= 511) { /* keyborad data, from task_a */
+				reg[7] = i - 256;
+				return 0;
+			}
+		}
 	}
+
 	return 0;
 }
 
