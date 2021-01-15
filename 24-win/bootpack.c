@@ -43,6 +43,8 @@ void HariMain(void)
 	struct TIMER *timer;
 	int key_to = 0, key_shift = 0, key_leds = (binfo->leds >> 4) & 7, keycmd_wait = -1;
 	struct CONSOLE *cons;
+	int j, x, y, mmx = -1, mmy = -1;
+	struct SHEET *sht = 0;
 
 	init_gdtidt();
 	init_pic();
@@ -278,6 +280,9 @@ void HariMain(void)
 					task_cons->tss.eip = (int) asm_end_app;
 					io_sti();
 				}
+				if (i == 256 + 0x57 && shtctl->top > 2) {	/* F11 put window on top*/
+					sheet_updown(shtctl->sheets[1], shtctl->top - 1);
+				}
 				if (i == 256 + 0xfa)
 				{ /* The keyboard received the data successfully. */
 					keycmd_wait = -1;
@@ -318,14 +323,37 @@ void HariMain(void)
 					{
 						my = binfo->scrny - 1;
 					}
-					sprintf(s, "(%3d, %3d)", mx, my);
-					putfonts8_asc_sht(sht_back, 0, 0, COL8_FFFFFF, COL8_008484, s, 10);
 					sheet_slide(sht_mouse, mx, my);
-					// move window
-					if ((mdec.btn & 0x01) != 0)
-					{
-						sheet_slide(sht_win, mx - 80, my - 8);
+	
+					if ((mdec.btn & 0x01) != 0) {
+						/* left button down */
+						if (mmx < 0) {
+							for (j = shtctl->top - 1; j > 0; j--) {
+								sht = shtctl->sheets[j];
+								x = mx - sht->vx0;
+								y = my - sht->vy0;
+								if (0 <= x && x < sht->bxsize && 0 <= y && y < sht->bysize) {
+									if (sht->buf[y * sht->bxsize + x] != sht->col_inv) {
+										sheet_updown(sht, shtctl->top - 1);
+										if (3 <= x && x < sht->bxsize - 3 && 3 <= y && y < 21) {
+											mmx = mx;	
+											mmy = my;
+										}
+										break;
+									}
+								}
+							}
+						} else {
+							x = mx - mmx;	
+							y = my - mmy;
+							sheet_slide(sht, sht->vx0 + x, sht->vy0 + y);
+							mmx = mx;	/* move */
+							mmy = my;
+						}
+					} else {
+						mmx = -1;	/* normal mode*/
 					}
+
 				}
 			}
 			else if (i <= 1)
