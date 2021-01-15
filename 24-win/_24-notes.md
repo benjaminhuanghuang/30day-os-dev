@@ -33,3 +33,9 @@ F11的按键编码为0x57（F12为0x58）
 
 change key_to to key_win
 
+修改hrb_api，为了在打开窗口的地方启用自动关闭窗口的功能，我们将flags和0x10进行OR运算。
+
+
+## 6 用鼠标切换输入窗口（harib21f）
+
+
