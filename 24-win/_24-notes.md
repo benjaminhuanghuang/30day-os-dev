@@ -37,5 +37,20 @@ change key_to to key_win
 
 
 ## 6 用鼠标切换输入窗口（harib21f）
+```
+  if (sht != key_win) {
+    cursor_c = keywin_off(key_win, sht_win, cursor_c, cursor_x);
+    key_win = sht;
+    cursor_c = keywin_on(key_win, sht_win, cursor_c);
+  }
+```                    
+
+## 7 定时器API（harib21g）
+EAX = 17, 18, 19
+
+
+
+## 8 取消定时器（harib21h）
+需要在定时器上增加一个标记，用来区分该定时器是否需要在应用程序结束时自动取消。如果没有这个标记的话，命令行窗口中用来控制光标闪烁的定时器也会被取消掉了。
 
 

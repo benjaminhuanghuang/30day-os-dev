@@ -389,7 +389,7 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
 					sheet_free(sht); /* close */
 				}
 			}
-
+			timer_cancelall(&task->fifo);
 			memman_free_4k(memman, (int)q, segsiz);
 		}
 		else
@@ -545,6 +545,23 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 				return 0;
 			}
 		}
+	}
+	else if (edx == 16)
+	{
+		reg[7] = (int)timer_alloc();
+		((struct TIMER *)reg[7])->flags2 = 1; // 允许自动取消
+	}
+	else if (edx == 17)
+	{
+		timer_init((struct TIMER *)ebx, &task->fifo, eax + 256);
+	}
+	else if (edx == 18)
+	{
+		timer_settime((struct TIMER *)ebx, eax);
+	}
+	else if (edx == 19)
+	{
+		timer_free((struct TIMER *)ebx);
 	}
 
 	return 0;
