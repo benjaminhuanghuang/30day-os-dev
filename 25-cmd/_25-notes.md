@@ -14,4 +14,6 @@ ON:IN(AL, 0x61); AL |= 0x03; AL &= 0x0f; OUT(0x61, AL)；
 OFF:IN(AL, 0x61); AL &= 0xd; OUT(0x61, AL)；
 
 
+## 2 增加更多的颜色（1）（harib22b）
+
 

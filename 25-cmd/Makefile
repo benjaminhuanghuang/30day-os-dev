@@ -74,6 +74,12 @@ beepdown.bim : beepdown.obj a_nask.obj Makefile
 beepdown.hrb : beepdown.bim Makefile
 	$(BIM2HRB)  beepdown.bim  beepdown.hrb 0
 
+color.bim : color.obj a_nask.obj Makefile
+	$(OBJ2BIM) @$(RULEFILE) out:color.bim map:color.map  color.obj a_nask.obj
+
+color.hrb : color.bim Makefile
+	$(BIM2HRB)  color.bim  color.hrb 0
+
 haribote.sys : asmhead.bin bootpack.hrb hello.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys
 
@@ -91,7 +97,7 @@ bug3.hrb : bug3.bim Makefile
 
 haribote.img : boot.bin haribote.sys Makefile \
 		hello.hrb winhello.hrb bug1.hrb bug3.hrb line.hrb noodle.hrb \
-		beepdown.hrb
+		beepdown.hrb color.hrb
 	$(EDIMG)   imgin:../z_tools/fdimg0at.tek \
 		wbinimg src:boot.bin len:512 from:0 to:0 \
 		copy from:haribote.sys to:@: \
@@ -103,6 +109,7 @@ haribote.img : boot.bin haribote.sys Makefile \
 		copy from:line.hrb to:@: \
 		copy from:noodle.hrb to:@: \
 		copy from:beepdown.hrb to:@: \
+		copy from:color.hrb to:@: \
 		imgout:haribote.img
 
 # general rules
