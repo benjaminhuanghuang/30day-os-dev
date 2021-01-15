@@ -53,3 +53,17 @@ hrb file
 0x001c (DWORD)  应用程序运行入口地址 -0x20
 0x0020 (DWORD)  malloc空间的起始地址
 ```
+Add hrb file support in console.c
+
+
+## 6 显示窗口（harib19f）
+```
+EDX = 5
+EBX = 窗口缓冲区
+ESI = 窗口在x轴方向上的大小（即窗口宽度）
+EDI = 窗口在y轴方向上的大小（即窗口高度）
+EAX = 透明色ECX = 窗口名称调用后，返
+
+回值如下：
+EAX =用于操作窗口的句柄（用于刷新窗口等操作）
+```

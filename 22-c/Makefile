@@ -50,6 +50,12 @@ hello.bim : hello.obj a_nask.obj Makefile
 hello.hrb : hello.bim Makefile
 	$(BIM2HRB) hello.bim hello.hrb 0
 
+winhello.bim : winhello.obj a_nask.obj Makefile
+	$(OBJ2BIM) @$(RULEFILE) out:winhello.bim map:winhello.map  winhello.obj a_nask.obj
+
+winhello.hrb : winhello.bim Makefile
+	$(BIM2HRB)  winhello.bim  winhello.hrb 0
+
 haribote.sys : asmhead.bin bootpack.hrb hello.hrb Makefile
 	cat asmhead.bin bootpack.hrb > haribote.sys
 
@@ -66,12 +72,13 @@ bug3.hrb : bug3.bim Makefile
 	$(BIM2HRB) bug3.bim bug3.hrb 0
 
 haribote.img : boot.bin haribote.sys Makefile \
-		hello.hrb bug1.hrb bug3.hrb
+		hello.hrb winhello.hrb bug1.hrb bug3.hrb
 	$(EDIMG)   imgin:../z_tools/fdimg0at.tek \
 		wbinimg src:boot.bin len:512 from:0 to:0 \
 		copy from:haribote.sys to:@: \
 		copy from:int.c to:@: \
 		copy from:hello.hrb to:@: \
+		copy from:winhello.hrb to:@: \
 		copy from:bug1.hrb to:@: \
 		copy from:bug3.hrb to:@: \
 		imgout:haribote.img

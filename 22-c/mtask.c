@@ -2,6 +2,71 @@
 struct TASKCTL *taskctl;
 struct TIMER *task_timer;
 
+
+/*
+    add task to task level
+*/
+void task_add(struct TASK *task)
+{
+    struct TASKLEVEL *tl = &taskctl->level[task->level];
+    tl->tasks[tl->running] = task;
+    tl->running++;
+    task->flags = 2; /* active */
+    return;
+}
+
+void task_remove(struct TASK *task)
+{
+    int i;
+    struct TASKLEVEL *tl = &taskctl->level[task->level];
+
+    /*寻找task所在的位置*/
+    for (i = 0; i < tl->running; i++)
+    {
+        if (tl->tasks[i] == task)
+        {
+            /*在这里  */
+            break;
+        }
+    }
+
+    tl->running--;
+    if (i < tl->now)
+    {
+        tl->now--; /*需要移动成员，要相应地处理  */
+    }
+    if (tl->now >= tl->running)
+    {
+        /*如果now的值出现异常，则进行修正*/
+        tl->now = 0;
+    }
+    task->flags = 1; /* 休眠中 */
+
+    /* 移动 */
+    for (; i < tl->running; i++)
+    {
+        tl->tasks[i] = tl->tasks[i + 1];
+    }
+    return;
+}
+
+/*
+    switch to which level
+*/
+void task_switchsub(void)
+{
+    int i;
+    /*寻找最上层的LEVEL */
+    for (i = 0; i < MAX_TASKLEVELS; i++) {
+        if (taskctl->level[i].running > 0) {
+            break; /*找到了*/
+        }
+    }
+    taskctl->now_lv = i;
+    taskctl->lv_change = 0;
+    return;
+}
+
 void task_idle(void)
 {
 	for (;;) {
@@ -149,66 +214,3 @@ struct TASK *task_now(void)
     return tl->tasks[tl->now];
 }
 
-/*
-    add task to task level
-*/
-void task_add(struct TASK *task)
-{
-    struct TASKLEVEL *tl = &taskctl->level[task->level];
-    tl->tasks[tl->running] = task;
-    tl->running++;
-    task->flags = 2; /* active */
-    return;
-}
-
-void task_remove(struct TASK *task)
-{
-    int i;
-    struct TASKLEVEL *tl = &taskctl->level[task->level];
-
-    /*寻找task所在的位置*/
-    for (i = 0; i < tl->running; i++)
-    {
-        if (tl->tasks[i] == task)
-        {
-            /*在这里  */
-            break;
-        }
-    }
-
-    tl->running--;
-    if (i < tl->now)
-    {
-        tl->now--; /*需要移动成员，要相应地处理  */
-    }
-    if (tl->now >= tl->running)
-    {
-        /*如果now的值出现异常，则进行修正*/
-        tl->now = 0;
-    }
-    task->flags = 1; /* 休眠中 */
-
-    /* 移动 */
-    for (; i < tl->running; i++)
-    {
-        tl->tasks[i] = tl->tasks[i + 1];
-    }
-    return;
-}
-
-/*
-    switch to which level
-*/
-void task_switchsub(void)
-{
-    int i;
-    /*寻找最上层的LEVEL */
-    for (i = 0; i < MAX_TASKLEVELS; i++) {
-        if (taskctl->level[i].running > 0) {
-            break; /*找到了*/
-        }
-    }
-    taskctl->now_lv = i;
-    taskctl->lv_change = 0;
-    return;
-}

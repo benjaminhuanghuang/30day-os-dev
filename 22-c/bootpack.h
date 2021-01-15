@@ -23,6 +23,7 @@ void load_gdtr(int limit, int addr);
 void load_idtr(int limit, int addr);
 int load_cr0(void);
 void store_cr0(int cr0);
+void load_tr(int tr);
 void asm_inthandler0c(void);
 void asm_inthandler0d(void);
 void asm_inthandler20(void);
@@ -233,12 +234,12 @@ struct TASKCTL {
 };
 
 extern struct TIMER *task_timer;
+struct TASK *task_now(void);
 struct TASK *task_init(struct MEMMAN *memman);
 struct TASK *task_alloc(void);
 void task_run(struct TASK *task, int level, int priority);
 void task_switch(void);
 void task_sleep(struct TASK *task);
-void task_switchsub(void);
 
 
 /* window.c */
