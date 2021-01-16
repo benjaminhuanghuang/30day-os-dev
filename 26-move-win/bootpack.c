@@ -224,10 +224,11 @@ void HariMain(void)
 					if (task != 0 && task->tss.ss0 != 0)
 					{ /* Shift+F1 */
 						cons_putstr0(task->cons, "\nBreak(key) :\n");
-						io_cli(); /* 強制終了処理中にタスクが変わると困るから */
+						io_cli(); /* 强制结束时禁止切换任务 */
 						task->tss.eax = (int)&(task->tss.esp0);
 						task->tss.eip = (int)asm_end_app;
 						io_sti();
+						task_run(task, -1, 0);
 					}
 				}
 				if (i == 256 + 0x3c && key_shift != 0) {	/* Shift+F2 */
@@ -322,6 +323,7 @@ void HariMain(void)
 												task->tss.eax = (int)&(task->tss.esp0);
 												task->tss.eip = (int)asm_end_app;
 												io_sti();
+												task_run(task, -1, 0); /* wake up*/
 											}
 											else{
 												// is console window
