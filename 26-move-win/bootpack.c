@@ -31,11 +31,8 @@ void HariMain(void)
 	// keyboard, mouse, timer use same fifo
 	struct FIFO32 fifo, keycmd;
 	int fifobuf[128], keycmd_buf[32], *cons_fifo[2];
-	;
-
 	char s[40];
 
-	int mx, my, i;
 	unsigned int memtotal;
 	struct MOUSE_DEC mdec;
 	struct MEMMAN *memman = (struct MEMMAN *)MEMMAN_ADDR;
@@ -44,7 +41,8 @@ void HariMain(void)
 	struct SHEET *sht_back, *sht_mouse, *sht_cons[2];
 	struct TASK *task_a, *task_cons[2], *task;
 	int key_shift = 0, key_leds = (binfo->leds >> 4) & 7, keycmd_wait = -1;
-	int j, x, y, mmx = -1, mmy = -1, mmx2=0;
+	int mx, my, i, new_mx = -1, new_my = 0, new_wx = 0x7fffffff, new_wy = 0;
+	int j, x, y, mmx = -1, mmy = -1, mmx2 = 0;
 	struct SHEET *sht = 0, *key_win;
 
 	init_gdtidt();
@@ -137,8 +135,19 @@ void HariMain(void)
 		io_cli();
 		if (fifo32_status(&fifo) == 0)
 		{
-			task_sleep(task_a);
-			io_sti();
+			// refresh when fifo is empty
+			if (new_mx >= 0) {
+				io_sti();
+				sheet_slide(sht_mouse, new_mx, new_my);
+				new_mx = -1;
+			} else if (new_wx != 0x7fffffff) {
+				io_sti();
+				sheet_slide(sht, new_wx, new_wy);
+				new_wx = 0x7fffffff;
+			} else {
+				task_sleep(task_a);
+				io_sti();
+			}
 		}
 		else
 		{
@@ -305,6 +314,7 @@ void HariMain(void)
 											mmx = mx;
 											mmy = my;
 											mmx2 = sht->vx0;
+											new_wy = sht->vy0;
 										}
 										if (sht->bxsize - 21 <= x && x < sht->bxsize - 5 && 5 <= y && y < 19)
 										{
@@ -335,7 +345,13 @@ void HariMain(void)
 					}
 					else
 					{
+						// left button is no down
 						mmx = -1; /* normal mode*/
+						if (new_wx != 0x7fffffff) {
+							sheet_slide(sht, new_wx, new_wy);	/* set sheet location */
+							new_wx = 0x7fffffff;
+						}
+
 					}
 				}
 			}
