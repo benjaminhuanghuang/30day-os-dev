@@ -2,7 +2,6 @@
 struct TASKCTL *taskctl;
 struct TIMER *task_timer;
 
-
 /*
     add task to task level
 */
