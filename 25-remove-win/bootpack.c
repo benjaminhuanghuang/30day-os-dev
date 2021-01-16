@@ -31,7 +31,7 @@ void HariMain(void)
 	struct BOOTINFO *binfo = (struct BOOTINFO *)ADR_BOOTINFO;
 	// keyboard, mouse, timer use same fifo
 	struct FIFO32 fifo, keycmd;
-	int fifobuf[128], keycmd_buf[32];
+	int fifobuf[128], keycmd_buf[32], *cons_fifo[2];;
 
 	char s[40];
 
@@ -71,9 +71,8 @@ void HariMain(void)
 	shtctl = shtctl_init(memman, binfo->vram, binfo->scrnx, binfo->scrny);
 	task_a = task_init(memman);
 	fifo.task = task_a;
-	task_run(task_a, 1, 0); /* level 1 */
-	*((int *) 0x0fe4) = (int) shtctl;   // pass shtctl to console
-
+	task_run(task_a, 1, 0);					/* level 1 */
+	*((int *)0x0fe4) = (int)shtctl; // pass shtctl to console
 
 	/* sht_back */
 	sht_back = sheet_alloc(shtctl);
@@ -82,7 +81,8 @@ void HariMain(void)
 	init_screen8(buf_back, binfo->scrnx, binfo->scrny);
 
 	/* sht_cons */
-	for (i = 0; i < 2; i++) {
+	for (i = 0; i < 2; i++)
+	{
 		sht_cons[i] = sheet_alloc(shtctl);
 		buf_cons[i] = (unsigned char *)memman_alloc_4k(memman, 256 * 165);
 		sheet_setbuf(sht_cons[i], buf_cons[i], 256, 165, -1); /* 透明色なし */
@@ -101,7 +101,9 @@ void HariMain(void)
 		*((int *)(task_cons[i]->tss.esp + 8)) = memtotal;
 		task_run(task_cons[i], 2, 2); /* level=2, priority=2 */
 		sht_cons[i]->task = task_cons[i];
-		sht_cons[i]->flags |= 0x20;	/* カーソルあり */
+		sht_cons[i]->flags |= 0x20; /* カーソルあり */
+		cons_fifo[i] = (int *) memman_alloc_4k(memman, 128 * 4);
+		fifo32_init(&task_cons[i]->fifo, 128, cons_fifo[i], task_cons[i]);
 	}
 
 	/* sht_mouse */
@@ -145,7 +147,8 @@ void HariMain(void)
 		{
 			i = fifo32_get(&fifo);
 			io_sti();
-			if (key_win->flags == 0) {	/* window is closed */
+			if (key_win->flags == 0)
+			{ /* window is closed */
 				key_win = shtctl->sheets[shtctl->top - 1];
 				keywin_on(key_win);
 			}
@@ -180,12 +183,13 @@ void HariMain(void)
 				{ /* text */
 					fifo32_put(&key_win->task->fifo, s[0] + 256);
 				}
-				
+
 				if (i == 256 + 0x0f)
 				{ /* Tab */
 					keywin_off(key_win);
 					j = key_win->height - 1;
-					if (j == 0) {
+					if (j == 0)
+					{
 						j = shtctl->top - 1;
 					}
 					key_win = shtctl->sheets[j];
@@ -226,18 +230,20 @@ void HariMain(void)
 					fifo32_put(&keycmd, KEYCMD_LED);
 					fifo32_put(&keycmd, key_leds);
 				}
-				if (i == 256 + 0x3b && key_shift != 0) { /* Shift+F1 */ 
+				if (i == 256 + 0x3b && key_shift != 0)
+				{ /* Shift+F1 */
 					task = key_win->task;
-					if (task != 0 && task->tss.ss0 != 0) {	/* Shift+F1 */
+					if (task != 0 && task->tss.ss0 != 0)
+					{ /* Shift+F1 */
 						cons_putstr0(task->cons, "\nBreak(key) :\n");
-						io_cli();	/* 強制終了処理中にタスクが変わると困るから */
-						task->tss.eax = (int) &(task->tss.esp0);
-						task->tss.eip = (int) asm_end_app;
+						io_cli(); /* 強制終了処理中にタスクが変わると困るから */
+						task->tss.eax = (int)&(task->tss.esp0);
+						task->tss.eip = (int)asm_end_app;
 						io_sti();
 					}
-
 				}
-				if (i == 256 + 0x57 && shtctl->top > 2) {	/* F11 put window on top*/
+				if (i == 256 + 0x57 && shtctl->top > 2)
+				{ /* F11 put window on top*/
 					sheet_updown(shtctl->sheets[1], shtctl->top - 1);
 				}
 				if (i == 256 + 0xfa)
@@ -274,35 +280,44 @@ void HariMain(void)
 						my = binfo->scrny - 1;
 					}
 					sheet_slide(sht_mouse, mx, my);
-	
-					if ((mdec.btn & 0x01) != 0) {
+
+					if ((mdec.btn & 0x01) != 0)
+					{
 						/* left button down */
-						if (mmx < 0) {
-							// normal mode, find window 
-							for (j = shtctl->top - 1; j > 0; j--) {
+						if (mmx < 0)
+						{
+							// normal mode, find window
+							for (j = shtctl->top - 1; j > 0; j--)
+							{
 								sht = shtctl->sheets[j];
 								x = mx - sht->vx0;
 								y = my - sht->vy0;
-								if (0 <= x && x < sht->bxsize && 0 <= y && y < sht->bysize) {
-									if (sht->buf[y * sht->bxsize + x] != sht->col_inv) {
+								if (0 <= x && x < sht->bxsize && 0 <= y && y < sht->bysize)
+								{
+									if (sht->buf[y * sht->bxsize + x] != sht->col_inv)
+									{
 										sheet_updown(sht, shtctl->top - 1);
-										if (sht != key_win) {
+										if (sht != key_win)
+										{
 											keywin_off(key_win);
 											key_win = sht;
 											keywin_on(key_win);
 										}
-										if (3 <= x && x < sht->bxsize - 3 && 3 <= y && y < 21) {
-											mmx = mx;	
+										if (3 <= x && x < sht->bxsize - 3 && 3 <= y && y < 21)
+										{
+											mmx = mx;
 											mmy = my;
 										}
-									if (sht->bxsize - 21 <= x && x < sht->bxsize - 5 && 5 <= y && y < 19) {
+										if (sht->bxsize - 21 <= x && x < sht->bxsize - 5 && 5 <= y && y < 19)
+										{
 											/* click on [x] */
-											if ((sht->flags & 0x10) != 0) {	/* A window created by the application？ */
+											if ((sht->flags & 0x10) != 0)
+											{ /* A window created by the application？ */
 												task = sht->task;
 												cons_putstr0(task->cons, "\nBreak(mouse) :\n");
-												io_cli();	/* 強制終了処理中にタスクが変わると困るから */
-												task->tss.eax = (int) &(task->tss.esp0);
-												task->tss.eip = (int) asm_end_app;
+												io_cli(); /* 強制終了処理中にタスクが変わると困るから */
+												task->tss.eax = (int)&(task->tss.esp0);
+												task->tss.eip = (int)asm_end_app;
 												io_sti();
 											}
 										}
@@ -310,16 +325,20 @@ void HariMain(void)
 									}
 								}
 							}
-						} else {
+						}
+						else
+						{
 							// moving mode
-							x = mx - mmx;	
+							x = mx - mmx;
 							y = my - mmy;
 							sheet_slide(sht, sht->vx0 + x, sht->vy0 + y);
-							mmx = mx;	/* move */
+							mmx = mx; /* move */
 							mmy = my;
 						}
-					} else {
-						mmx = -1;	/* normal mode*/
+					}
+					else
+					{
+						mmx = -1; /* normal mode*/
 					}
 				}
 			}
@@ -331,19 +350,20 @@ void keywin_off(struct SHEET *key_win)
 {
 	change_wtitle8(key_win, 0);
 
-		if ((key_win->flags & 0x20) != 0) {
-			fifo32_put(&key_win->task->fifo, 3); /*cursor OFF */
+	if ((key_win->flags & 0x20) != 0)
+	{
+		fifo32_put(&key_win->task->fifo, 3); /*cursor OFF */
 	}
-	return ;
+	return;
 }
 
 void keywin_on(struct SHEET *key_win)
 {
 	change_wtitle8(key_win, 1);
 
-		if ((key_win->flags & 0x20) != 0) {
-			fifo32_put(&key_win->task->fifo, 2); /* cursor ON */
-		}
+	if ((key_win->flags & 0x20) != 0)
+	{
+		fifo32_put(&key_win->task->fifo, 2); /* cursor ON */
+	}
 	return;
 }
-
