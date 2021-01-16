@@ -39,4 +39,5 @@ bootpack.c HariMain()
 增加了new_mx和new_wy两个变量，并将原来的sheet_slide（sht_mouse, mx, my）；改成了new_mx = mx; new_my = my;，也就是并不真的移动鼠标图层的位置，而是将移动后的坐标暂且保存起来，当FIFO为空时，再执行sheet_slide（sht_mouse, new_mx, new_my）;。
 
 ## 5 启动时只打开一个命令行窗口（harib23e）
-
+们就将启动时显示的命令行窗口数量改为一个，并且实现可以随意启动新命令行窗口的功能
+规定按下Shift+F2就打开一个新的命令行窗口
