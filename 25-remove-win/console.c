@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void console_task(struct SHEET *sheet, unsigned int memtotal)
+void console_task(struct SHEET *sheet, int memtotal)
 {
 	struct TASK *task = task_now();
 	struct MEMMAN *memman = (struct MEMMAN *)MEMMAN_ADDR;
@@ -13,7 +13,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 	cons.cur_x = 8;
 	cons.cur_y = 28;
 	cons.cur_c = -1;
-	task->cons = (int)&cons;
+	task->cons = &cons;
 
 	cons.timer = timer_alloc();
 	timer_init(cons.timer, &task->fifo, 1);
@@ -205,7 +205,7 @@ void cons_newline(struct CONSOLE *cons)
 	return;
 }
 
-void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int memtotal)
+void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, int memtotal)
 {
 	if (strcmp(cmdline, "mem") == 0)
 	{
@@ -234,7 +234,7 @@ void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int mem
 	return;
 }
 
-void cmd_mem(struct CONSOLE *cons, unsigned int memtotal)
+void cmd_mem(struct CONSOLE *cons, int memtotal)
 {
 	struct MEMMAN *memman = (struct MEMMAN *)MEMMAN_ADDR;
 	char s[30];
@@ -448,7 +448,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 	{
 		sht = (struct SHEET *)(ebx & 0xfffffffe);
 		putfonts8_asc(sht->buf, sht->bxsize, esi, edi, eax, (char *)ebp + ds_base);
-		if ((edx & 1) == 0)
+		if ((ebx & 1) == 0)
 		{
 			sheet_refresh(sht, esi, edi, esi + ecx * 8, edi + 16);
 		}
@@ -457,7 +457,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 	{
 		sht = (struct SHEET *)(ebx & 0xfffffffe);
 		boxfill8(sht->buf, sht->bxsize, ebp, eax, ecx, esi, edi);
-		if ((edx & 1) == 0)
+		if ((ebx & 1) == 0)
 		{
 			sheet_refresh(sht, eax, ecx, esi + 1, edi + 1);
 		}
@@ -482,7 +482,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 	{
 		sht = (struct SHEET *)(ebx & 0xfffffffe);
 		sht->buf[sht->bxsize * edi + esi] = eax;
-		if ((edx & 1) == 0)
+		if ((ebx & 1) == 0)
 		{
 			sheet_refresh(sht, esi, edi, esi + 1, edi + 1);
 		}
