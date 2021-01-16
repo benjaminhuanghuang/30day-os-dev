@@ -1,6 +1,5 @@
 #include "bootpack.h"
 #include <stdio.h>
-#include <string.h>
 
 #define KEYCMD_LED 0xed
 
@@ -52,15 +51,13 @@ void HariMain(void)
 	init_pic();
 	io_sti(); // disable CPU interrupt.
 	fifo32_init(&fifo, 128, fifobuf, 0);
-	fifo32_init(&keycmd, 32, fifobuf, 0);
+	fifo32_init(&keycmd, 32, keycmd_buf, 0);
 	init_pit();
 	init_keyboard(&fifo, 256);
 	enable_mouse(&fifo, 512, &mdec);
 
 	io_out8(PIC0_IMR, 0xf8); /*Allow keyboard, timer PIC (111111000)*/
 	io_out8(PIC1_IMR, 0xef); /*Allow mouse PIC (11101111)*/
-
-	fifo32_init(&keycmd, 32, keycmd_buf, 0);
 
 	memtotal = memtest(0x00400000, 0xbfffffff);
 	memman_init(memman);
@@ -71,7 +68,7 @@ void HariMain(void)
 	shtctl = shtctl_init(memman, binfo->vram, binfo->scrnx, binfo->scrny);
 	task_a = task_init(memman);
 	fifo.task = task_a;
-	task_run(task_a, 1, 0);					/* level 1 */
+	task_run(task_a, 1, 2);					/* level 1 */
 	*((int *)0x0fe4) = (int)shtctl; // pass shtctl to console
 
 	/* sht_back */
@@ -89,7 +86,7 @@ void HariMain(void)
 		make_window8(buf_cons[i], 256, 165, "console", 0);
 		make_textbox8(sht_cons[i], 8, 28, 240, 128, COL8_000000);
 		task_cons[i] = task_alloc();
-		task_cons[i]->tss.esp = memman_alloc_4k(memman, 64 * 1024) + 64 * 1024 - 8;
+		task_cons[i]->tss.esp = memman_alloc_4k(memman, 64 * 1024) + 64 * 1024 - 12;
 		task_cons[i]->tss.eip = (int)&console_task;
 		task_cons[i]->tss.es = 1 * 8;
 		task_cons[i]->tss.cs = 2 * 8;

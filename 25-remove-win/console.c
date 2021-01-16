@@ -236,7 +236,6 @@ void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat, unsigned int mem
 
 void cmd_mem(struct CONSOLE *cons, unsigned int memtotal)
 {
-
 	struct MEMMAN *memman = (struct MEMMAN *)MEMMAN_ADDR;
 	char s[30];
 	sprintf(s, "total   %dMB", memtotal / (1024 * 1024));
@@ -278,7 +277,7 @@ void cmd_dir(struct CONSOLE *cons)
 		{
 			if ((finfo[i].type & 0x18) == 0)
 			{
-				sprintf(s, "filename.ext   %7d", finfo[i].size);
+				sprintf(s, "filename.ext   %7d\n", finfo[i].size);
 				for (j = 0; j < 8; j++)
 				{
 					s[j] = finfo[i].name[j];
@@ -384,7 +383,7 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
 			for (i = 0; i < MAX_SHEETS; i++)
 			{
 				sht = &(shtctl->sheets0[i]);
-				if (sht->flags & 0x11 == 0x11 && sht->task == task)
+				if ((sht->flags & 0x11) == 0x11 && sht->task == task)
 				{
 					sheet_free(sht); /* close */
 				}

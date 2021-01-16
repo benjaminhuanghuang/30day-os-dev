@@ -280,7 +280,7 @@ void cmd_dir(struct CONSOLE *cons)
 		{
 			if ((finfo[i].type & 0x18) == 0)
 			{
-				sprintf(s, "filename.ext   %7d", finfo[i].size);
+				sprintf(s, "filename.ext   %7d\n", finfo[i].size);
 				for (j = 0; j < 8; j++)
 				{
 					s[j] = finfo[i].name[j];

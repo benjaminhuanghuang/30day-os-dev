@@ -577,7 +577,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 							{
 								if ((finfo[x].type & 0x18) == 0)
 								{
-									sprintf(s, "filename.ext   %7d", finfo[x].size);
+									sprintf(s, "filename.ext   %7d\n", finfo[x].size);
 									for (y = 0; y < 8; y++)
 									{
 										s[y] = finfo[x].name[y];
