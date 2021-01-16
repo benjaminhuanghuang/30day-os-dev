@@ -38,8 +38,8 @@ struct TASK {
     int level, priority;
     struct FIFO32 fifo;
     struct TSS32 tss;
-    struct CONSOLE ＊cons;   /＊从此开始＊/
-    int ds_base;              /＊到此结束＊/
+    struct CONSOLE ＊cons;   
+    int ds_base;             
 };
 ```
 
