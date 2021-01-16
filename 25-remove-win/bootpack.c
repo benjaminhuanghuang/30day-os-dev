@@ -238,7 +238,7 @@ void HariMain(void)
 						io_sti();
 					}
 				}
-				if (i == 256 + 0x57 && shtctl->top > 2)
+				if (i == 256 + 0x57)
 				{ /* F11 put window on top*/
 					sheet_updown(shtctl->sheets[1], shtctl->top - 1);
 				}
