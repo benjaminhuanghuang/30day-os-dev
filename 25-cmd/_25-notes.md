@@ -28,9 +28,20 @@ edx = 5
 要解决这个问题，可以考虑修改一下命令行窗口，使其在应用程序运行中就可以输入下一条命令，不过这样的修改量实在太大，讲解起来也会很麻烦，
 因此改用同时启动两个命令行窗口
 
+task_cons -> task_cons[0]和task_cons[1]
 
 ## 6 增加命令行窗口（2）（harib22f）
-
+每个task 必须有各自独立的 consol 和 ds_base
+```
+struct TASK {
+    int sel, flags; /＊ sel代表GDT编号＊/
+    int level, priority;
+    struct FIFO32 fifo;
+    struct TSS32 tss;
+    struct CONSOLE ＊cons;   /＊从此开始＊/
+    int ds_base;              /＊到此结束＊/
+};
+```
 
 ## 7 增加命令行窗口（3）（harib22g）
 

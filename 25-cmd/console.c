@@ -13,7 +13,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 	cons.cur_x = 8;
 	cons.cur_y = 28;
 	cons.cur_c = -1;
-	*((int *)0x0fec) = (int)&cons;
+	task->cons = (int)&cons;
 
 	fifo32_init(&task->fifo, 128, fifobuf, task);
 	cons.timer = timer_alloc();
@@ -372,7 +372,7 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
 			datsiz = *((int *)(p + 0x0010));
 			dathrb = *((int *)(p + 0x0014));
 			q = (char *)memman_alloc_4k(memman, segsiz);
-			*((int *)0xfe8) = (int)q;
+			task->ds_base = (int)q;
 			set_segmdesc(gdt + 1003, finfo->size - 1, (int)p, AR_CODE32_ER + 0x60);
 			set_segmdesc(gdt + 1004, segsiz - 1, (int)q, AR_DATA32_RW + 0x60);
 			for (i = 0; i < datsiz; i++)
