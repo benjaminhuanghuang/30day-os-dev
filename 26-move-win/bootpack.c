@@ -44,7 +44,7 @@ void HariMain(void)
 	struct SHEET *sht_back, *sht_mouse, *sht_cons[2];
 	struct TASK *task_a, *task_cons[2], *task;
 	int key_shift = 0, key_leds = (binfo->leds >> 4) & 7, keycmd_wait = -1;
-	int j, x, y, mmx = -1, mmy = -1;
+	int j, x, y, mmx = -1, mmy = -1, mmx2=0;
 	struct SHEET *sht = 0, *key_win;
 
 	init_gdtidt();
@@ -304,6 +304,7 @@ void HariMain(void)
 										{
 											mmx = mx;
 											mmy = my;
+											mmx2 = sht->vx0;
 										}
 										if (sht->bxsize - 21 <= x && x < sht->bxsize - 5 && 5 <= y && y < 19)
 										{
@@ -328,8 +329,7 @@ void HariMain(void)
 							// moving mode
 							x = mx - mmx;
 							y = my - mmy;
-							sheet_slide(sht, sht->vx0 + x, sht->vy0 + y);
-							mmx = mx; /* move */
+							sheet_slide(sht, (mmx2+x+2 )& ~3, sht->vy0 + y);
 							mmy = my;
 						}
 					}

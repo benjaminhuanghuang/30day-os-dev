@@ -439,7 +439,8 @@ int *hrb_api(int edi, int esi, int ebp, int esp, int ebx, int edx, int ecx, int 
 		sht->flags |= 0x10;
 		sheet_setbuf(sht, (char *) ebx + ds_base, esi, edi, eax);
 		make_window8((char *) ebx + ds_base, esi, edi, (char *) ecx + ds_base, 0);
-		sheet_slide(sht, (shtctl->xsize - esi) / 2, (shtctl->ysize - edi) / 2);
+		// ~3 = 0xfffffffc
+		sheet_slide(sht, (shtctl->xsize - esi) / 2 & ~3, (shtctl->ysize - edi) / 2);
 		// Make it the same height as the current mouse: the mouse will be on top
 		sheet_updown(sht, shtctl->top); 
 		reg[7] = (int) sht;
