@@ -7,8 +7,8 @@ void keywin_off(struct SHEET *key_win);
 void keywin_on(struct SHEET *key_win);
 
 static char keytable0[0x80] = {
-		0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '^', 0, 0,
-		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '@', '[', 0, 0, 'A', 'S',
+		0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '^', 0x08, 0,
+		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '@', '[', 0x0a, 0, 'A', 'S',
 		'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', ':', 0, 0, ']', 'Z', 'X', 'C', 'V',
 		'B', 'N', 'M', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, '7', '8', '9', '-', '4', '5', '6', '+', '1',
@@ -16,8 +16,8 @@ static char keytable0[0x80] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0x5c, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x5c, 0, 0};
 static char keytable1[0x80] = {
-		0, 0, '!', 0x22, '#', '$', '%', '&', 0x27, '(', ')', '~', '=', '~', 0, 0,
-		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '`', '{', 0, 0, 'A', 'S',
+		0, 0, '!', 0x22, '#', '$', '%', '&', 0x27, '(', ')', '~', '=', '~', 0x08, 0,
+		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '`', '{', 0x0a, 0, 'A', 'S',
 		'D', 'F', 'G', 'H', 'J', 'K', 'L', '+', '*', 0, 0, '}', 'Z', 'X', 'C', 'V',
 		'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, '7', '8', '9', '-', '4', '5', '6', '+', '1',
@@ -30,7 +30,8 @@ void HariMain(void)
 	struct BOOTINFO *binfo = (struct BOOTINFO *)ADR_BOOTINFO;
 	// keyboard, mouse, timer use same fifo
 	struct FIFO32 fifo, keycmd;
-	int fifobuf[128], keycmd_buf[32], *cons_fifo[2];;
+	int fifobuf[128], keycmd_buf[32], *cons_fifo[2];
+	;
 
 	char s[40];
 
@@ -98,7 +99,7 @@ void HariMain(void)
 		task_run(task_cons[i], 2, 2); /* level=2, priority=2 */
 		sht_cons[i]->task = task_cons[i];
 		sht_cons[i]->flags |= 0x20; /* カーソルあり */
-		cons_fifo[i] = (int *) memman_alloc_4k(memman, 128 * 4);
+		cons_fifo[i] = (int *)memman_alloc_4k(memman, 128 * 4);
 		fifo32_init(&task_cons[i]->fifo, 128, cons_fifo[i], task_cons[i]);
 	}
 
