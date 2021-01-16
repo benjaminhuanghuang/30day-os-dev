@@ -5,7 +5,8 @@
 
 void keywin_off(struct SHEET *key_win);
 void keywin_on(struct SHEET *key_win);
-struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal);
+void close_console(struct SHEET *sht);
+void close_constask(struct TASK *task);
 
 static char keytable0[0x80] = {
 		0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '^', 0x08, 0,
@@ -357,6 +358,8 @@ void HariMain(void)
 			}
 			else if (768 <= i && i <= 1023) {	/* exit console */
 				close_console(shtctl->sheets0 + (i - 768));
+			} else if (1024 <=i &&  i <=2-32){
+				close_constask(shtctl->sheets0 + (i - 1024));
 			}
 		}
 	}
@@ -384,16 +387,11 @@ void keywin_on(struct SHEET *key_win)
 	return;
 }
 
-struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal)
+struct TASK *open_constask(struct SHEET *sht, unsigned int memtotal)
 {
 	struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
-	struct SHEET *sht = sheet_alloc(shtctl);
-	unsigned char *buf = (unsigned char *) memman_alloc_4k(memman, 256 * 165);
 	struct TASK *task = task_alloc();
 	int *cons_fifo = (int *) memman_alloc_4k(memman, 128 * 4);
-	sheet_setbuf(sht, buf, 256, 165, -1); /* 透明色 */
-	make_window8(buf, 256, 165, "console", 0);
-	make_textbox8(sht, 8, 28, 240, 128, COL8_000000);
 	task->cons_stack = memman_alloc_4k(memman, 64 * 1024);
 	task->tss.esp = task->cons_stack + 64 * 1024 - 12;
 	task->tss.eip = (int) &console_task;
@@ -406,12 +404,22 @@ struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal)
 	*((int *) (task->tss.esp + 4)) = (int) sht;
 	*((int *) (task->tss.esp + 8)) = memtotal;
 	task_run(task, 2, 2); /* level=2, priority=2 */
-	sht->task = task;
-	sht->flags |= 0x20;	/* cursor on */
 	fifo32_init(&task->fifo, 128, cons_fifo, task);
-	return sht;
+	return task;
 }
 
+struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal)
+{
+	struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+	struct SHEET *sht = sheet_alloc(shtctl);
+	unsigned char *buf = (unsigned char *) memman_alloc_4k(memman, 256 * 165);
+	sheet_setbuf(sht, buf, 256, 165, -1); /* 透明色なし */
+	make_window8(buf, 256, 165, "console", 0);
+	make_textbox8(sht, 8, 28, 240, 128, COL8_000000);
+	sht->task = open_constask(sht, memtotal);
+	sht->flags |= 0x20;	/* カーソルあり */
+	return sht;
+}
 
 void close_constask(struct TASK *task)
 {
