@@ -45,3 +45,23 @@ bootpack.c HariMain()
 
 ## 6 增加更多的命令行窗口（harib23f）
 sht_cons[]了，如果顺利的话，命令行窗口将不再有数量的限制，只要内存空间足够，就可以想开多少开多少。
+
+
+## 7 关闭命令行窗口（1）（harib23g）
+在Windows的命令行窗口中，输入“exit”命令就可以关闭当前窗口
+
+关闭一个命令行窗口首先需要将创建该窗口时所占用的内存空间全部释放出来，然后还需要释放窗口的图层和任务结构
+
+在创建任务时我们为命令行窗口准备了专用的栈，却没有将这个栈的地址保存起来，这样的话就无法执行释放操作了。
+需要在TASK结构中添加一个cons_stack成员，用来保存栈的地址。
+
+Update open_console
+```
+	task->cons_stack = memman_alloc_4k(memman, 64 * 1024);
+```
+
+Add command "exit" in cons_runcmd()
+
+
+## 8 关闭命令行窗口（2）（harib23h）
+
