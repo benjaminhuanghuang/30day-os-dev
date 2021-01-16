@@ -314,12 +314,19 @@ void HariMain(void)
 										{
 											/* click on [x] */
 											if ((sht->flags & 0x10) != 0)
-											{ /* A window created by the application？ */
+											{ /* is an application window？ */
 												task = sht->task;
 												cons_putstr0(task->cons, "\nBreak(mouse) :\n");
 												io_cli(); /* 強制終了処理中にタスクが変わると困るから */
 												task->tss.eax = (int)&(task->tss.esp0);
 												task->tss.eip = (int)asm_end_app;
+												io_sti();
+											}
+											else{
+												// is console window
+												task = sht ->task;
+												io_cli();
+												fifo32_put(&task->fifo, 4);
 												io_sti();
 											}
 										}
