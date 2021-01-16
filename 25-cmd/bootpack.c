@@ -132,8 +132,8 @@ void HariMain(void)
 	sheet_updown(sht_back, 0);
 	sheet_updown(sht_cons[1], 1);
 	sheet_updown(sht_cons[0], 2);
-	sheet_updown(sht_win, 2);
-	sheet_updown(sht_mouse, 3);
+	sheet_updown(sht_win, 3);
+	sheet_updown(sht_mouse, 4);
 	key_win = sht_win;
 
 	//
@@ -349,7 +349,7 @@ void HariMain(void)
 										}
 									if (sht->bxsize - 21 <= x && x < sht->bxsize - 5 && 5 <= y && y < 19) {
 											/* click on [x] */
-											if (sht->task != 0) {	/* A window created by the application？ */
+											if (sht->flags & 0x10 != 0) {	/* A window created by the application？ */
 												cons = (struct CONSOLE *) *((int *) 0x0fec);
 												cons_putstr0(cons, "\nBreak(mouse) :\n");
 												io_cli();	/*  */

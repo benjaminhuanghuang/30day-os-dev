@@ -38,10 +38,11 @@ struct TASK {
     int level, priority;
     struct FIFO32 fifo;
     struct TSS32 tss;
-    struct CONSOLE ＊cons;   
+    struct CONSOLE *cons;   
     int ds_base;             
 };
 ```
+
 
 ## 7 增加命令行窗口（3）（harib22g）
 
