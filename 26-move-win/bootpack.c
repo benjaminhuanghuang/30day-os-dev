@@ -57,6 +57,7 @@ void HariMain(void)
 	io_out8(PIC0_IMR, 0xf8); /*Allow keyboard, timer PIC (111111000)*/
 	io_out8(PIC1_IMR, 0xef); /*Allow mouse PIC (11101111)*/
 	fifo32_init(&keycmd, 32, keycmd_buf, 0);
+	*((int *) 0x0fec) = (int) &fifo;
 
 	memtotal = memtest(0x00400000, 0xbfffffff);
 	memman_init(memman);
@@ -78,7 +79,6 @@ void HariMain(void)
 
 	/* sht_cons */
 	key_win = open_console(shtctl, memtotal);
-
 
 	/* sht_mouse */
 	sht_mouse = sheet_alloc(shtctl);
@@ -130,10 +130,14 @@ void HariMain(void)
 		{
 			i = fifo32_get(&fifo);
 			io_sti();
-			if (key_win->flags == 0)
+			if (key_win != 0 && key_win->flags == 0)
 			{ /* window is closed */
-				key_win = shtctl->sheets[shtctl->top - 1];
-				keywin_on(key_win);
+				if (shtctl->top == 1) {	/* only desktop and mouse are left*/
+					key_win = 0;
+				} else {
+					key_win = shtctl->sheets[shtctl->top - 1];
+					keywin_on(key_win);
+				}
 			}
 
 			if (256 < i && i <= 511)
@@ -162,7 +166,7 @@ void HariMain(void)
 					}
 				}
 
-				if (s[0] != 0)
+				if (s[0] != 0 && key_win!=0)  // key_win!=0 mean there is no console
 				{ /* text */
 					fifo32_put(&key_win->task->fifo, s[0] + 256);
 				}
@@ -213,7 +217,7 @@ void HariMain(void)
 					fifo32_put(&keycmd, KEYCMD_LED);
 					fifo32_put(&keycmd, key_leds);
 				}
-				if (i == 256 + 0x3b && key_shift != 0)
+				if (i == 256 + 0x3b && key_shift != 0 && key_win !=0 )
 				{ /* Shift+F1 */
 					task = key_win->task;
 					if (task != 0 && task->tss.ss0 != 0)
@@ -226,8 +230,12 @@ void HariMain(void)
 					}
 				}
 				if (i == 256 + 0x3c && key_shift != 0) {	/* Shift+F2 */
+					if(key_win !=0)
+					{
+						// off current window
+						keywin_off(key_win);
+					}
 					/* set cursor to the new win */
-					keywin_off(key_win);
 					key_win = open_console(shtctl, memtotal);
 					sheet_slide(key_win, 64, 4);
 					sheet_updown(key_win, shtctl->top);
@@ -337,9 +345,11 @@ void HariMain(void)
 							sheet_slide(sht, new_wx, new_wy);	/* set sheet location */
 							new_wx = 0x7fffffff;
 						}
-
 					}
 				}
+			}
+			else if (768 <= i && i <= 1023) {	/* exit console */
+				close_console(shtctl->sheets0 + (i - 768));
 			}
 		}
 	}
@@ -378,7 +388,7 @@ struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal)
 	make_window8(buf, 256, 165, "console", 0);
 	make_textbox8(sht, 8, 28, 240, 128, COL8_000000);
 	task->cons_stack = memman_alloc_4k(memman, 64 * 1024);
-	task->tss.esp = memman_alloc_4k(memman, 64 * 1024) + 64 * 1024 - 12;
+	task->tss.esp = task->cons_stack + 64 * 1024 - 12;
 	task->tss.eip = (int) &console_task;
 	task->tss.es = 1 * 8;
 	task->tss.cs = 2 * 8;
