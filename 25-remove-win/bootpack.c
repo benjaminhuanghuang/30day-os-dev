@@ -43,7 +43,6 @@ void HariMain(void)
 	struct SHEET *sht_back, *sht_mouse, *sht_cons[2];
 	struct TASK *task_a, *task_cons[2], *task;
 	int key_shift = 0, key_leds = (binfo->leds >> 4) & 7, keycmd_wait = -1;
-	struct CONSOLE *cons;
 	int j, x, y, mmx = -1, mmy = -1;
 	struct SHEET *sht = 0, *key_win;
 
@@ -51,13 +50,13 @@ void HariMain(void)
 	init_pic();
 	io_sti(); // disable CPU interrupt.
 	fifo32_init(&fifo, 128, fifobuf, 0);
-	fifo32_init(&keycmd, 32, keycmd_buf, 0);
 	init_pit();
 	init_keyboard(&fifo, 256);
 	enable_mouse(&fifo, 512, &mdec);
 
 	io_out8(PIC0_IMR, 0xf8); /*Allow keyboard, timer PIC (111111000)*/
 	io_out8(PIC1_IMR, 0xef); /*Allow mouse PIC (11101111)*/
+	fifo32_init(&keycmd, 32, keycmd_buf, 0);
 
 	memtotal = memtest(0x00400000, 0xbfffffff);
 	memman_init(memman);
