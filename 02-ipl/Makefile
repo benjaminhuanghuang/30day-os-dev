@@ -1,25 +1,13 @@
-TOOLPATH = ../z_tools/
-
-MAKE     = make
-NASK     = $(TOOLPATH)nask
-EDIMG    = $(TOOLPATH)edimg
-
-default :
-	$(MAKE) img
 
 ipl.bin : ipl.asm Makefile
-	$(NASK) ipl.asm ipl.bin ipl.lst
+	nasm ipl.asm -o ipl.bin
 
-myos.img : ipl.bin Makefile
-	$(EDIMG)   imgin:../z_tools/fdimg0at.tek \
-		wbinimg src:ipl.bin len:512 from:0 to:0 \
-		imgout:myos.img
+img : ipl.bin Makefile
+	dd if=ipl.bin of=myos.img bs=512 count=1
 
-run :
-	$(MAKE) myos.img
+run : img
 	qemu-system-i386 -fda myos.img -boot a
 
 
 clean :
 	rm ipl.bin
-	rm ipl.lst
