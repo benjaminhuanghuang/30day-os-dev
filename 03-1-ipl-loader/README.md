@@ -38,7 +38,9 @@ FAT12对引导扇区的格式有规定
 ![](./_images/fat12-boot.png)
 
 loader.asm 包含 FAT12信息以及 0x55AA 标记，用 dd 命令把loader.bin写入第一个sector
+
 把kernel.bin作为文件copy到disk的文件系统中
+
 P55: 向一个空floppy disk写入文件时，文件名会出现在磁盘0x2600
 文件内容会出现在磁盘0x4200.
 
