@@ -1,5 +1,5 @@
 ## 加载更多的扇区
-1张软盘有80个柱面，2个磁头，18个扇区，且一个扇区有512字节。所以，一张软盘的容量是：
+1张软盘有80个柱面(Cylinder)，2个磁头(Head)，18个扇区(Sector)，且一个扇区有512字节。所以，一张软盘的容量是：
 
 80×2×18×512 = 1474560 Byte = 1440KB
 
@@ -8,6 +8,9 @@
 
 ## BIOS 0x13
 - http://community.osdev.info/? (AT)BIOS
+
+- https://en.wikipedia.org/wiki/INT_13H
+
 ```
   AH=0x02;（读盘）
   AH=0x03;（写盘）
