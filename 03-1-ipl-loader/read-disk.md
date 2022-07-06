@@ -6,7 +6,7 @@
 含有IPL的启动区，位于C0-H0-S1（柱面0，磁头0，扇区1的缩写）
 
 
-磁盘读写需要使用 BIOS的0x13号函数
+## BIOS 0x13
 - http://community.osdev.info/? (AT)BIOS
 ```
   AH=0x02;（读盘）

@@ -14,4 +14,4 @@ run: img
 	qemu-system-i386 -fda myos.img -boot a
 
 clean:
-	rm *.bin
+	rm *.bin *.img
