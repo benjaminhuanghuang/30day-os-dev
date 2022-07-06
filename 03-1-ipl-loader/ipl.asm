@@ -1,4 +1,6 @@
-		ORG		0x7c00			; 指明程序装载地址
+CYLS 	EQU 	10				; 声明扇面数		
+
+ORG		0x7c00			    ; 指明程序装载地址
 
 ; 标准FAT12格式软盘专用的代码 Stand FAT12 format floppy code
 
@@ -47,16 +49,30 @@ retry:
   MOV     BX,0
   MOV     DL,0x00             ; 驱动器编号, 0isA驱动器
   INT     0x13                ; 调用磁盘BIOS
-  JNC     fin                 ; No error
+  JNC     next                ; if No error, read next sector
   ADD     SI, 1        
   CMP     SI, 5
-  JAE     error               ; if SI >=5, jump to error
-  MOV  AH, 0x00               ; reset
+  JAE     error               ; if SI >=5, jump to error, else reset dirver & retry
+  MOV  AH, 0x00               ; reset dirver
   MOV  DL , 0x00              ; Dirver A
   INT  0x13                   ; reset Driver
   JMP  retry
 
-; 虽然读完了，但是因为暂时没有要做的事所以停止等待指令
+next:
+		MOV		AX,ES			; 把内存地址后移0x200, 因为每次读取512(0x200)bytes
+		ADD		AX,0X0020
+		MOV		ES,AX			; 因为没有ADD ES，0x020指令，这里绕个弯
+		ADD		CL,1			; 往CL里加1
+		CMP		CL,18			; 比较CL与18
+		JBE		readloop		; 如果CL<=18 跳转至readloop
+		MOV		CL,1
+		ADD 	DH,1
+		CMP		DH,2
+		JB 		readloop		; 如果DH<2，跳转到readloop
+		MOV		DH,0
+		ADD 	CH,1
+		CMP 	CH,CYLS			
+		JB 		readloop		; 如果CH<CYLS，跳转到readloop
 
 fin:
   HLT                         ; 让CPU停止，等待指令
