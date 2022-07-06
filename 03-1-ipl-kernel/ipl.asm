@@ -68,7 +68,7 @@ next:
 		MOV		CL,1
 		ADD 	DH,1
 		CMP		DH,2
-		JB 		readloop		; 如果DH<2，跳转到readloop
+		JB 		readloop		; 如果DH<2，跳转到readloop, 交替读取 Driver Head 0 and Deirver Head 1
 		MOV		DH,0
 		ADD 	CH,1
 		CMP 	CH,CYLS			

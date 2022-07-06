@@ -15,6 +15,11 @@ https://blog.csdn.net/qwe19910328/article/details/107009326
   -s: Shorthand for -gdb tcp::1234, i.e. open a gdbserver on TCP port 1234
 ```
 
+指定端口
+```
+  qemu-system-i386 -fda myos.img -gdb tcp::10000 -S
+```
+
 在另一个终端调用gdb 通过 qemu 进行 debug
 ```
 (gdb) target remote localhost:1234
