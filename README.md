@@ -4,6 +4,7 @@
 
 - [30天自制操作系统光盘](https://gitee.com/paud/30daysOS)
 
+https://github.com/yourtion/30dayMakeOS
 
 
 ## Setup
