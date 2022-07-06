@@ -6,6 +6,8 @@
 
 https://github.com/yourtion/30dayMakeOS
 
+https://github.com/SeanCraftsman/OSASK/
+
 
 ## Setup
 asm + c 的混合编译在不同的环境下会出问题
