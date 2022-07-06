@@ -37,6 +37,8 @@ entry:
   MOV     CH,0                ; 柱面0
   MOV     DH,0                ; 磁头0
   MOV     CL,2                ; 扇区2
+
+readloop:
   MOV     SI, 0               ; 记录失败次数
 
 retry: 
@@ -45,7 +47,7 @@ retry:
   MOV     BX,0
   MOV     DL,0x00             ; 驱动器编号, 0isA驱动器
   INT     0x13                ; 调用磁盘BIOS
-  JNC      error              ; No error
+  JNC     fin                 ; No error
   ADD     SI, 1        
   CMP     SI, 5
   JAE     error               ; if SI >=5, jump to error
