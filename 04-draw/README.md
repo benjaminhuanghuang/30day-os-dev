@@ -1,4 +1,5 @@
 # Day 4
+设置调色板, IO 操作, draw bow , draw window
 
 ## 有关指针操作 (p69)
 
