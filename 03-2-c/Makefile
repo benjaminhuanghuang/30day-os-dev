@@ -30,4 +30,6 @@ debug: img
 	qemu-system-i386 -fda myos.img -boot a -s -S
 
 clean:
-	rm *.bin *.img
+	rm *.bin *.img *.o
+
+	
