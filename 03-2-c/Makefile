@@ -6,16 +6,19 @@ ipl.bin : ipl.asm
 asmhead.bin : asmhead.asm 
 	nasm asmhead.asm -o asmhead.bin
 
-kernel.bin : asmhead.bin bootpack.bin
-	cat asmhead.bin bootpack.bin > kernel.bin
+bootpack.elf.o: bootpack.c
+	gcc -m32 -fno-pie -o bootpack.elf.o -c bootpack.c
 
+asmfunc.o : asmfunc.asm
+	nasm -f elf32 asmfunc.asm -o asmfunc.o
 
 bootpack.bin : bootpack.c asmfunc.o  
 	#
 	nasm kernel.asm -o kernel.bin
 
-asmfunc.o : asmfunc.asm
-	nasm -g -f elf nasmfunc.asm -o nasmfunc.o
+
+kernel.bin : asmhead.bin bootpack.bin
+	cat asmhead.bin bootpack.bin > kernel.bin
 
 
 img: bin

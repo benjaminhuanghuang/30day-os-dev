@@ -23,8 +23,9 @@ myos.img : boot.bin haribote.sys
 img :
 	make -r myos.img
 
-run: img
-	qemu-system-i386 -fda myos.img -boot a
+run :
+	make img
+	qemu-system-i386 -fda myos.img  # "-fda" for floppy disk
 		
 debug :
 	make img
