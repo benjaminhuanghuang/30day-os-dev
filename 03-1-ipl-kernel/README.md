@@ -48,6 +48,13 @@ loader启动后会把kernel加载到0x8000，然后Jump 到 0x8000
 
 ipl.asm 包含 FAT12信息以及 0x55AA 标记，用 dd 命令把ipl.bin写入第一个sector
 
+P55: 向一个空floppy disk写入文件时，文件名会出现在磁盘`0x2600`, 文件内容会出现在磁盘`0x4200`.
+
+根目录区从19扇区开始，每个扇区512bytes，因此根目录下第一个文件的目录信息开始于19*512 = 0x2600
+
+数据区开始扇区号 = 根目录开始扇区号+ 目录所占区号 = 19 + 14 = 33
+
+
 把haribote.sys(kernel)作为文件copy到disk的文件系统中
 ```
 haribote.img : ipl.bin haribote.sys Makefile
@@ -57,17 +64,25 @@ haribote.img : ipl.bin haribote.sys Makefile
 		imgout:haribote.img
 ```
 
+
 https://superuser.com/questions/868117/layouting-a-disk-image-and-copying-files-into-it
 
+Ubuntu 上的做法如下: (!这种做法不能正常工作, 原因待查!!!!)
 ```
+  sudo mount -t vfat -o loop myos.img ~/temp/mnt
+	sudo mcopy kernel.bin ~/temp/mnt
+	sudo umount ~/temp/mnt
 ```
+
+
+3. 折衷方案
+根据 FAT的定义, 磁盘的数据区起始于33 扇区,  因此 把 kerenl 文件 用 dd 复制到第 33 扇区
+```
+  dd if=kernel.bin of=myos.img seek=33 bs=512 conv=notrunc
+``` 
+
 
 ## 加载到内存什么位置
-P55: 向一个空floppy disk写入文件时，文件名会出现在磁盘`0x2600`, 文件内容会出现在磁盘`0x4200`.
-
-根目录区从19扇区开始，每个扇区512bytes，因此根目录下第一个文件的目录信息开始于19*512 = 0x2600
-
-数据区开始扇区号 = 根目录开始扇区号+ 目录所占区号 = 19 + 14 = 33
 
 第一个文件的起始位置在 512 * 33 = 0x4200
 

@@ -1,11 +1,9 @@
-extern HariMain        ; from C fun
-[BITS 16]
-[section .text]
-global _start
+
 
 BOTPAK	EQU		0x00280000		; 加载bootpack
 DSKCAC	EQU		0x00100000		; 磁盘缓存的位置
 DSKCAC0	EQU		0x00008000		; 磁盘缓存的位置（实模式）
+
 
 ; BOOT_INFO相关
 CYLS	EQU		0x0ff0			; 引导扇区设置
@@ -15,7 +13,11 @@ SCRNX	EQU		0x0ff4			; 分辨率X
 SCRNY	EQU		0x0ff6			; 分辨率Y
 VRAM	EQU		0x0ff8			; 图像缓冲区的起始地址
 
+; 使用linker script指定起始地址
+  [SECTION .text]
+  [BITS 16]
 
+entry:
 		MOV		AL,0x13			; VGA显卡，320x200x8bit
 		MOV		AH,0x00
 		INT		0x10
@@ -99,18 +101,21 @@ pipelineflush:
 
 ; bootpack启动
 
-		MOV		EBX,BOTPAK       ; 
-		MOV		ECX,[EBX+16]
-		ADD		ECX,3			; ECX += 3;
-		SHR		ECX,2			; ECX /= 4;
-		JZ		skip			; 传输完成
-		MOV		ESI,[EBX+20]	; 源
-		ADD		ESI,EBX
-		MOV		EDI,[EBX+12]	; 目标
-		CALL	memcpy
+		;MOV		EBX,BOTPAK       ; 
+		;MOV		ECX,[EBX+16]
+		;ADD		ECX,3			; ECX += 3;
+		;SHR		ECX,2			; ECX /= 4;
+		;JZ		skip			; 传输完成
+		;MOV		ESI,[EBX+20]	; 源
+		;ADD		ESI,EBX
+		;MOV		EDI,[EBX+12]	; 目标
+		;CALL	memcpy
 skip:
-		MOV		ESP,[EBX+12]	; 堆栈的初始化
-		JMP		DWORD 2*8:0x0000001b
+		;MOV		ESP,[EBX+12]	; 堆栈的初始化
+		;JMP		DWORD 2*8:0x0000001b
+    ; 此处做了修改
+    MOV   ESP, 0xffff
+    JMP   DWORD 2*8:0x00000000
 
 waitkbdout:
 		IN		 AL,0x64
@@ -144,7 +149,5 @@ GDTR0:
 		ALIGNB	16
 bootpack:
 
-_start:
-  call HariMain ; asm call c function
 
 

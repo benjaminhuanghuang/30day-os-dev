@@ -4,9 +4,14 @@
 
 - [30天自制操作系统光盘](https://gitee.com/paud/30daysOS)
 
+- 30天自制操作系统(NASM、GCC)
+https://gitee.com/ghosind/HariboteOS/tree/main
+
+
 https://github.com/yourtion/30dayMakeOS
 
 https://github.com/SeanCraftsman/OSASK/
+
 
 
 ## Setup
