@@ -4,19 +4,13 @@ extern void io_cli(void);
 extern void io_out8(int port, int data);
 extern int io_load_eflags(void);
 extern void io_store_eflags(int eflags);
-// extern void write_mem8(int addr, int data);   // demo memory write
 
 
 void init_palette(void);
 void set_palette(int start, int end, unsigned char *rgb);
 
-void HariMain(void)
+int main(void)
 {
-  // for (int i = 0xa0000; i < 0xaffff; i++)
-  // {
-  //   write_mem8(i, 15); // MOV BTYPE [i], 15
-  // }
-
   char *p = (char *) 0xa0000;
 	int i;
 	for (i = 0; i <= 0xffff; i++) {

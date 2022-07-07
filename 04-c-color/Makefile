@@ -1,84 +1,31 @@
-TOOLPATH = ../z_tools/
-INCPATH  = ../z_tools/haribote/
+ipl.bin: ipl.asm
+	nasm ipl.asm -o ipl.bin
 
-MAKE     = make
-NASK     = $(TOOLPATH)nask
-CC1      = $(TOOLPATH)gocc1 -I$(INCPATH) -Os -Wall -quiet
-GAS2NASK = $(TOOLPATH)gas2nask -a
-OBJ2BIM  = $(TOOLPATH)obj2bim
-BIM2HRB  = $(TOOLPATH)bim2hrb
-BIN2OBJ  = $(TOOLPATH)bin2obj
-RULEFILE = $(TOOLPATH)haribote/haribote.rul
-EDIMG    = $(TOOLPATH)edimg
-MAKEFONT = $(TOOLPATH)makefont
-IMGTOL   = $(TOOLPATH)imgtol.com
-DEL      = rm
+asmhead.o: asmhead.asm 
+	nasm -f elf32 asmhead.asm -o asmhead.o -l asmhead.lst
 
-# デフォルト動作
+asmfunc.o: asmfunc.asm
+	nasm -f elf32 asmfunc.asm -o asmfunc.o -l asmfunc.lst
 
-default :
-	$(MAKE) img
+bootpack.o: bootpack.c
+	gcc -m32 -fno-pie -o bootpack.o -c bootpack.c
 
-# ファイル生成規則
+kernel.bin: bootpack.o asmfunc.o asmhead.o 
+	ld -m elf_i386 --oformat binary -T bootpack.ld  asmhead.o bootpack.o asmfunc.o -o kernel.bin
 
-boot.bin : boot.asm Makefile
-	$(NASK) boot.asm boot.bin
+img: ipl.bin kernel.bin
+	dd if=/dev/zero of=myos.img bs=512 count=2880
+	dd if=ipl.bin of=myos.img bs=512 count=1 conv=notrunc
+	dd if=kernel.bin of=myos.img seek=33 bs=512 conv=notrunc
 
-asmhead.bin : asmhead.asm Makefile
-	$(NASK) asmhead.asm asmhead.bin
+run: img
+	qemu-system-i386 -fda myos.img -boot a
 
-bootpack.gas : bootpack.c Makefile
-	$(CC1) -o bootpack.gas bootpack.c
+debug: img
+	qemu-system-i386 -fda myos.img -boot a -s -S
 
-bootpack.nas : bootpack.gas Makefile
-	$(GAS2NASK) bootpack.gas bootpack.nas
+clean:
+	rm *.bin *.img *.o *.lst
+	
 
-bootpack.obj : bootpack.nas Makefile
-	$(NASK) bootpack.nas bootpack.obj bootpack.lst
-
-nasmfunc.obj : nasmfunc.asm Makefile
-	$(NASK) nasmfunc.asm nasmfunc.obj nasmfunc.lst
-
-
-bootpack.bim : bootpack.obj nasmfunc.obj Makefile
-	$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map \
-		bootpack.obj nasmfunc.obj 
-
-bootpack.hrb : bootpack.bim Makefile
-	$(BIM2HRB) bootpack.bim bootpack.hrb 0
-
-haribote.sys : asmhead.bin bootpack.hrb Makefile
-	cat asmhead.bin bootpack.hrb > haribote.sys
-
-haribote.img : boot.bin haribote.sys Makefile
-	$(EDIMG)   imgin:../z_tools/fdimg0at.tek \
-		wbinimg src:boot.bin len:512 from:0 to:0 \
-		copy from:haribote.sys to:@: \
-		imgout:haribote.img
-
-img :
-	$(MAKE) haribote.img
-
-run :
-	$(MAKE) img
-	qemu-system-i386 -fda haribote.img -boot a
-
-install :
-	$(MAKE) img
-	$(IMGTOL) w a: haribote.img
-
-clean :
-	-$(DEL) *.bin
-	-$(DEL) *.lst
-	-$(DEL) *.gas
-	-$(DEL) *.obj
-	-$(DEL) bootpack.nas
-	-$(DEL) bootpack.map
-	-$(DEL) bootpack.bim
-	-$(DEL) bootpack.hrb
-	-$(DEL) haribote.sys
-	-$(DEL) *.img
-	-$(DEL) *.o
-src_only :
-	$(MAKE) clean
-	-$(DEL) haribote.img
+	
