@@ -1,4 +1,5 @@
-[BITS 16]
+[BITS 32]
+
 GLOBAL  io_hlt, write_mem8, myprint
 
 [section .text]
