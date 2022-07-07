@@ -66,9 +66,6 @@ GS——没有名称（segment part 3）
 但根据C语言的规约，执行RET语句时，`EAX`中的值就被看作是函数的返回值。
 
 
-## JMP, JC
-JC，是“jump if carry”的缩写，意思是如果进位标志（carry flag）是1的话，就跳转
-
 
 ## PUSH / POP
 PUSH EAX

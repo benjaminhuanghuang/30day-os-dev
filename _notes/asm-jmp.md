@@ -1,6 +1,9 @@
-Jump if not carry
+
+
+Jump if Carry Flag is 1 or 0
 ```
-JNC     next                ; No error
+JC      next                ; if error (carry flag is 1)
+JNC     next                ; No error (carry flag is 0)
 ```
 
 Jump if above or equal
