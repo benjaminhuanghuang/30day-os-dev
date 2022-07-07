@@ -1,6 +1,4 @@
-## Draw
-
-想要画东西的话，只要往 VRAM 里写点什么就可以了。但是在 C 语言中又没有直接写入指定内存地址的语句.因此需要在 naskfunc.nas 添加一个有这种功能的 ASM 函数
+## Draw = 写 VRAM
 
 ```
 write_mem8:	; void write_mem8(int addr, int data);
@@ -10,9 +8,20 @@ write_mem8:	; void write_mem8(int addr, int data);
    RET
 ```
 
+使用pointer
+```
+  unsigned char *p = (unsigned char *) 0xa0000;
+
+	for (int i = 0; i <= 0xffff; i++) {
+	  *(p + i) = i & 0x0f;
+    // 
+    p[i] = i & 0x0f;
+	}
+```
+
 ## 256 palette
 
-VGA 320\*200 8 位调色板模式，8 位只能使用 0 ～ 255，256 种颜色，
+VGA 320x200 8 位调色板模式，8 位只能使用 0 ～ 255，256 种颜色，
 
 而 RGB 方式，用 6 位十六进制数，也就是 24 位（二进制）来指定颜色。8 位数完全不够。
 
@@ -24,7 +33,11 @@ https://gitee.com/paud/30daysOS/blob/master/projects/04_day/harib01f/
 
 ```
     init_palette()
+
+    set_palette();           // 用到了io 操作
 ```
+
+本书只用了 16 种颜色
 
 ## Draw rectangle
 
