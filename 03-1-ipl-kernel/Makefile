@@ -8,7 +8,11 @@ kernel.bin : kernel.asm
 
 img: ipl.bin kernel.bin
 	dd if=/dev/zero of=myos.img bs=512 count=2880
-	mcopy -i myos.img kernel.bin ::
+	dd if=ipl.bin of=myos.img bs=512 count=1 conv=notrunc
+	mkfs.vfat -F 12 myos.img
+	sudo mount -t vfat -o loop myos.img ~/temp/mnt
+	sudo cp kernel.bin ~/temp/mnt
+	sudo umount ~/temp/mnt
 
 run: img
 	qemu-system-i386 -fda myos.img -boot a
