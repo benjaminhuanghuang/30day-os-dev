@@ -74,6 +74,9 @@ next:
 		CMP 	CH,CYLS			
 		JB 		readloop		; 如果CH<CYLS，跳转到readloop
 
+; Execute kernel
+; kernel.bin is at 0x4200 on disk, 
+; The 第二扇区 will be load to 0x8200 in memory, So the address 0x4200 on disk will be 0x8000+0x4200 = 0xc200 in the memory
 fin:
   MOV		[0x0ff0],CH           ; 记录CH             
   JMP		0xc200                ; jump to kernel
