@@ -1,7 +1,7 @@
 extern HariMain        ; from C fun
 [BITS 16]
 [section .text]
-
+global _start
 
 ; kernel.bin is at 0x4200 on disk, 
 ; The disk will be load to 0x8000 in memory, So the address is 0x8000+0x4200 = 0xc200
@@ -140,4 +140,5 @@ GDTR0:
 
 		ALIGNB	16
 bootpack:
+_start:
   call HariMain
