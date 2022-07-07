@@ -10,7 +10,7 @@ img: ipl.bin kernel.bin
 	dd if=/dev/zero of=myos.img bs=512 count=2880
 	dd if=ipl.bin of=myos.img bs=512 count=1 conv=notrunc
 	sudo mount -t vfat -o loop myos.img ~/temp/mnt
-	sudo cp kernel.bin ~/temp/mnt
+	sudo mcopy kernel.bin ~/temp/mnt
 	sudo umount ~/temp/mnt
 
 run: img

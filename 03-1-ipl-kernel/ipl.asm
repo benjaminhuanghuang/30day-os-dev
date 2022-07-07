@@ -75,8 +75,8 @@ next:
 		JB 		readloop		; 如果CH<CYLS，跳转到readloop
 
 fin:
-  HLT                         ; 让CPU停止，等待指令
-  JMP     fin                 ; 无限循环
+  MOV		[0x0ff0],CH           ; 记录CH             
+  JMP		0xc200                ; jump to kernel
 
 error:
   MOV     SI,msg
