@@ -26,7 +26,7 @@ img: ipl.bin kernel.bin
 run: img
 	qemu-system-i386 -fda myos.img -boot a
 
-debug :
+debug: img
 	qemu-system-i386 -fda myos.img -boot a -s -S
 
 clean:
