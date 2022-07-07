@@ -1,24 +1,14 @@
-#include <stdio.h>   // in the C compiler by the author
-
 extern void io_hlt(void);
 extern void io_cli(void);
 extern void io_out8(int port, int data);
 extern int io_load_eflags(void);
 extern void io_store_eflags(int eflags);
-extern char hankaku[4096];   // 256 chars
-
-// extern void write_mem8(int addr, int data);   // demo memory write
 
 void init_palette(void);
 void set_palette(int start, int end, unsigned char *rgb);
 void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, int x1, int y1);
 void init_screen(char *vram, int x, int y);
 void putfont8(char *vram, int xsize, int x, int y, char c, char *font);
-void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s);
-// Mouse
-void init_mouse_cursor8(char *mouse, char bc);
-void putblock8_8(char *vram, int vxsize, int pxsize,
-	int pysize, int px0, int py0, char *buf, int bxsize);
 
 /*
 	color name in the palette
@@ -39,20 +29,6 @@ void putblock8_8(char *vram, int vxsize, int pxsize,
 #define COL8_840084 13
 #define COL8_008484 14
 #define COL8_848484 15
-
-void demo_fill_screen()
-{
-	// for (int i = 0xa0000; i < 0xaffff; i++)
-	// {
-	//   write_mem8(i, 15); // MOV BTYPE [i], 15
-	// }
-	char *p = (char *)0xa0000;
-	int i;
-	for (i = 0; i <= 0xffff; i++)
-	{
-		*(p + i) = i & 0x0f;
-	}
-}
 
 
 struct BOOTINFO {
@@ -80,30 +56,19 @@ void load_gdtr(int limit, int addr);
 void load_idtr(int limit, int addr);
 
 
-void HariMain(void)
+void main(void)
 {
+	struct BOOTINFO *binfo = (struct BOOTINFO *) 0x0ff0;
+	static char font_A[16] = {
+		0x00, 0x18, 0x18, 0x18, 0x18, 0x24, 0x24, 0x24,
+		0x24, 0x7e, 0x42, 0x42, 0x42, 0xe7, 0x00, 0x00
+	};
+
 	init_palette();
-
-	struct BOOTINFO *binfo = (struct BOOTINFO *) 0x0ff0; // those infor were saved by asmhead.asm
-	extern char hankaku[4096];
-
 	init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
-	putfonts8_asc(binfo->vram, binfo->scrnx,  8,  8, COL8_FFFFFF, "ABC 123");
-	putfonts8_asc(binfo->vram, binfo->scrnx, 31, 31, COL8_000000, "Hello OS.");
-	putfonts8_asc(binfo->vram, binfo->scrnx, 30, 30, COL8_FFFFFF, "Hello OS.");
-	
-	char s[40];
-	sprintf(s, "scrnx = %d", binfo->scrnx);
-	putfonts8_asc(binfo->vram, binfo->scrnx, 16, 64, COL8_FFFFFF, s);
+	putfont8(binfo->vram, binfo->scrnx, 10, 10, COL8_FFFFFF, font_A);
 
-	// Mouse
-	char mcursor[256];
-	init_mouse_cursor8(mcursor, COL8_008484);
-	int mx = (binfo->scrnx - 16)/2;
-	int my = (binfo->scrny - 28 - 16)/2;
-	putblock8_8(binfo->vram, binfo->scrnx, 16, 16, mx, my, mcursor, 16);
-	for (;;)
-	{
+	for (;;) {
 		io_hlt();
 	}
 }
@@ -208,15 +173,15 @@ void putfont8(char *vram, int xsize, int x, int y, char color, char *font)
 	return;
 }
 
-void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s)
-{
-	extern char hankaku[4096];
-	for (; *s != 0x00; s++) {
-		putfont8(vram, xsize, x, y, c, hankaku + *s * 16);
-		x += 8;
-	}
-	return;
-}
+// void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s)
+// {
+// 	extern char hankaku[4096];
+// 	for (; *s != 0x00; s++) {
+// 		putfont8(vram, xsize, x, y, c, hankaku + *s * 16);
+// 		x += 8;
+// 	}
+// 	return;
+// }
 
 
 void init_mouse_cursor8(char *mouse, char bc)
