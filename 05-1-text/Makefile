@@ -10,8 +10,11 @@ asmfunc.o: asmfunc.asm
 bootpack.o: bootpack.c
 	gcc -m32 -fno-pie -o bootpack.o -c bootpack.c
 
-kernel.bin: bootpack.o asmfunc.o asmhead.o 
-	ld -m elf_i386 --oformat binary -T bootpack.ld  asmhead.o bootpack.o asmfunc.o -o kernel.bin
+hankaku.o: hankaku.c
+	gcc -m32 -fno-pie -o hankaku.o -c hankaku.c
+
+kernel.bin: bootpack.o asmfunc.o asmhead.o hankaku.o
+	ld -m elf_i386 --oformat binary -T bootpack.ld  asmhead.o bootpack.o hankaku.o asmfunc.o -o kernel.bin
 
 img: ipl.bin kernel.bin
 	dd if=/dev/zero of=myos.img bs=512 count=2880

@@ -25,7 +25,27 @@ ysize = binfo->scrnx;
 
 
   void putfont8(char *vram, int xsize, int x, int y, char c, char *font);
-  
-  void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s);
-
 ```
+
+## font
+Conert hankaku.txt to a asm data 
+```
+  _hankaku:
+    DB....
+```
+hankaku.txt 包含 256 个字符 
+
+A 的编码是 0x41, 也就是A的ASCII 码, 其数据就在 hankaku + 'A' * 16 的地方
+
+use it in C
+```
+  extra char hankadu[4096];
+
+  putfont8(binfo->vram, binfo->scrnx,  8, 8, COL8_FFFFFF, hankaku + 'A' * 16);
+
+  putfonts8_asc(binfo->vram, binfo->scrnx,  8,  8, COL8_FFFFFF, "ABC 123");
+```
+
+
+
+
