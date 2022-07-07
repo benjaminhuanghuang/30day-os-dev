@@ -1,27 +1,22 @@
-bin: boot.bin	kernel.bin
-
-ipl.bin : ipl.asm
+ipl.bin: ipl.asm
 	nasm ipl.asm -o ipl.bin
 
-asmhead.bin : asmhead.asm 
-	nasm asmhead.asm -o asmhead.bin
+asmhead.o: asmhead.asm 
+	nasm -f elf32 asmhead.asm -o asmhead.o
 
-bootpack.elf.o: bootpack.c
-	gcc -m32 -fno-pie -o bootpack.elf.o -c bootpack.c
-
-asmfunc.o : asmfunc.asm
+asmfunc.o: asmfunc.asm
 	nasm -f elf32 asmfunc.asm -o asmfunc.o
 
-bootpack.bin : bootpack.c asmfunc.o  
-	#
-	nasm kernel.asm -o kernel.bin
+bootpack.o: bootpack.c
+	gcc -m32 -fno-pie -o bootpack.o -c bootpack.c
 
+bootpack.bin: bootpack.o asmfunc.o asmhead.o 
+	ld -m elf_i386 -Ttext 0xc200 bootpack.o asmfunc.o asmhead.o -o bootpack.bin
 
-kernel.bin : asmhead.bin bootpack.bin
-	cat asmhead.bin bootpack.bin > kernel.bin
+kernel.bin: bootpack.bin
+	objcopy -O binary -j.text bootpack.bin kernel.bin  
 
-
-img: bin
+img: ipl.bin kernel.bin
 	dd if=/dev/zero of=myos.img bs=512 count=2880
 	dd if=ipl.bin of=myos.img bs=512 count=1 conv=notrunc
 	sudo mount -t vfat -o loop myos.img ~/temp/mnt

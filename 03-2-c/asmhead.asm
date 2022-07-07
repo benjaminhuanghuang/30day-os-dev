@@ -1,3 +1,8 @@
+extern HariMain        ; from C fun
+[BITS 16]
+[section .text]
+
+
 ; kernel.bin is at 0x4200 on disk, 
 ; The disk will be load to 0x8000 in memory, So the address is 0x8000+0x4200 = 0xc200
 
@@ -13,9 +18,6 @@ VMODE	EQU		0x0ff2			; 记录VMODE how many bits for color？
 SCRNX	EQU		0x0ff4			; 分辨率X
 SCRNY	EQU		0x0ff6			; 分辨率Y
 VRAM	EQU		0x0ff8			; 图形缓冲区起始地址
-
-
-  ORG		0xc200			; 
 
   MOV		AL,0x13			; VGA图形，320x200x8bit彩色
   MOV		AH,0x00
@@ -138,3 +140,4 @@ GDTR0:
 
 		ALIGNB	16
 bootpack:
+  call HariMain
