@@ -57,6 +57,12 @@ haribote.img : ipl.bin haribote.sys Makefile
 		imgout:haribote.img
 ```
 
+https://superuser.com/questions/868117/layouting-a-disk-image-and-copying-files-into-it
+
+```
+```
+
+## 加载到内存什么位置
 P55: 向一个空floppy disk写入文件时，文件名会出现在磁盘`0x2600`, 文件内容会出现在磁盘`0x4200`.
 
 根目录区从19扇区开始，每个扇区512bytes，因此根目录下第一个文件的目录信息开始于19*512 = 0x2600
@@ -65,8 +71,6 @@ P55: 向一个空floppy disk写入文件时，文件名会出现在磁盘`0x2600
 
 第一个文件的起始位置在 512 * 33 = 0x4200
 
-
-## 加载到内存什么位置
 因为loader会把disk上从C0-H0-S2开始到C0-H0-S18的内容加载到0x8200，
 
 所以kernel(位于磁盘0x4200)会被加载到内存(0x8200-0x200)+0x4200 = 0xc200的位置。
