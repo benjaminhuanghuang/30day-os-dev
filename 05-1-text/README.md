@@ -50,7 +50,10 @@ use it in C
 
 ## use sprintf 修改链接方式
 harib02g
-sprintf 只是将内容输出到内存中, 不依赖os
+sprintf 只是将内容输出到内存中, 不依赖os，因此可以在任何平台运行
+https://gitee.com/paud/30daysOS/tree/master/projects/05_day/harib02g
+
+书中的sprintf是作者使用的c编译器自带的函数
 ```
   #include "stdio.h"
 
@@ -58,6 +61,9 @@ sprintf 只是将内容输出到内存中, 不依赖os
   sprintf(s, "scrnx = %d", binfo->scrnx);
 	putfonts8_asc(binfo->vram, binfo->scrnx, 16, 64, COL8_FFFFFF, s);	
 ```
+
+为了使用GCC, 要自己实现sprintf
+
 to fix 
 ```
 stdio.c:(.text+0x2b2): undefined reference to `__stack_chk_fail'
