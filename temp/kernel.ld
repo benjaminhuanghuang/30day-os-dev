@@ -1,4 +1,4 @@
-ENTRY( entry )
+ENTRY( main )
 
 MEMORY
 {

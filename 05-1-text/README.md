@@ -48,11 +48,11 @@ use it in C
 ```
 
 
-## use sprintf 
+## use sprintf 修改链接方式
 harib02g
 sprintf 只是将内容输出到内存中, 不依赖os
 ```
-  #include <stdio.h>
+  #include "stdio.h"
 
   char s[40];
   sprintf(s, "scrnx = %d", binfo->scrnx);
@@ -66,3 +66,19 @@ add CFLAGS
 ```
   -fno-stack-protector
 ```
+
+前几章一直使用ld 链接生成 kernel.bin
+sprintf() 不能正常工作,什么也不显示, 参考 https://gitee.com/ghosind/HariboteOS/blob/main/day5/Makefile 的做法
+1. 把 asmhead.asm 编译成 bin 文件, 并使用 ORG   0xc200 指定加载位置
+2. 其余部分(kernel_c)用ld 链接, 并指定起始地址为 0
+3. 用 cat命令把 asmhead.o 和 kernel_c.o 写入同一个文件
+
+同时需要修改 ld 中对memory的设定
+```
+MEMORY
+{
+  rom : ORIGIN = 0x000000, LENGTH = 0x280000
+  ram : ORIGIN = 0x280000, LENGTH = 0x020000
+}
+```
+

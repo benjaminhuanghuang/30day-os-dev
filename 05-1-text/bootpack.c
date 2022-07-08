@@ -46,10 +46,10 @@ int main(void)
 	
 	init_palette();
 	init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
-	// putfonts8_asc(binfo->vram, binfo->scrnx, 30, 30, COL8_FFFFFF, "Haribote OS.");
+	putfonts8_asc(binfo->vram, binfo->scrnx, 30, 30, COL8_FFFFFF, "Haribote OS.");
 
   char s[40];
-  // sprintf(s, "scrnx = %d", binfo->scrnx);
+  sprintf(s, "scrnx = %d", binfo->scrnx);
 	putfonts8_asc(binfo->vram, binfo->scrnx, 16, 64, COL8_FFFFFF,s);
   
   for (;;) {
