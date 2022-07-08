@@ -13,9 +13,8 @@ SCRNX	EQU		0x0ff4			; 分辨率X
 SCRNY	EQU		0x0ff6			; 分辨率Y
 VRAM	EQU		0x0ff8			; 图像缓冲区的起始地址
 
-; 使用linker script指定起始地址
-  [SECTION .text]
-  [BITS 16]
+ORG   0xc200            ; 程序被加载的内存地址  
+[BITS 16]
 
 entry:
 		MOV		AL,0x13			; VGA显卡，320x200x8bit

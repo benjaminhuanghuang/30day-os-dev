@@ -1,4 +1,4 @@
-#include <stdio.h>   // in the C compiler by the author
+#include "stdio.h"   // in the C compiler by the author
 
 extern void io_hlt(void);
 extern void io_cli(void);
@@ -6,8 +6,6 @@ extern void io_out8(int port, int data);
 extern int io_load_eflags(void);
 extern void io_store_eflags(int eflags);
 extern char hankaku[4096];   // 256 chars
-
-// extern void write_mem8(int addr, int data);   // demo memory write
 
 void init_palette(void);
 void set_palette(int start, int end, unsigned char *rgb);
@@ -39,21 +37,6 @@ void putblock8_8(char *vram, int vxsize, int pxsize,
 #define COL8_840084 13
 #define COL8_008484 14
 #define COL8_848484 15
-
-void demo_fill_screen()
-{
-	// for (int i = 0xa0000; i < 0xaffff; i++)
-	// {
-	//   write_mem8(i, 15); // MOV BTYPE [i], 15
-	// }
-	char *p = (char *)0xa0000;
-	int i;
-	for (i = 0; i <= 0xffff; i++)
-	{
-		*(p + i) = i & 0x0f;
-	}
-}
-
 
 struct BOOTINFO {
 	char cyls, leds, vmode, reserve;

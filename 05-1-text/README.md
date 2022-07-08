@@ -1,5 +1,5 @@
 # Day 5 - 1
-Refactor the makefile
+Refactor the makefile , Change link config
 
 ## struct 
 haribo02b
