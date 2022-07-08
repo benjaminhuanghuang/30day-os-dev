@@ -58,4 +58,11 @@ sprintf 只是将内容输出到内存中, 不依赖os
   sprintf(s, "scrnx = %d", binfo->scrnx);
 	putfonts8_asc(binfo->vram, binfo->scrnx, 16, 64, COL8_FFFFFF, s);	
 ```
-
+to fix 
+```
+stdio.c:(.text+0x2b2): undefined reference to `__stack_chk_fail'
+```
+add CFLAGS
+```
+  -fno-stack-protector
+```

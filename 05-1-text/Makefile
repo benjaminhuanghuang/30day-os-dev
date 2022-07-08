@@ -4,8 +4,7 @@ ASFLAGS:= -f elf32
 CC:= gcc
 # CFLAGS += -Wall -Wno-format -Wno-unused
 CFLAGS+= -std=c11 -fno-stack-protector
-# CFLAGS+= -I./libc/include
-# CFLAGS += -ffunction-sections -fno-builtin -ffreestanding # -nostdinc -nostdlib 
+# CFLAGS += -ffunction-sections -fno-builtin -ffreestanding -nostdinc -nostdlib 
 CFLAGS+= -fno-pie -m32 -c
 
 # Kernel Objects, the order matters!
@@ -36,7 +35,7 @@ debug: img
 	qemu-system-i386 -fda myos.img -boot a -s -S
 
 clean:
-	rm *.bin *.img *.o *.lst
+	rm *.bin *.img *.o
 	
 
 	
