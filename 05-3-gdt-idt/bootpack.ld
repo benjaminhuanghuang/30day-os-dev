@@ -1,9 +1,32 @@
 ENTRY( entry )
 
+MEMORY
+{
+  rom : ORIGIN = 0x000000, LENGTH = 0x280000
+  ram : ORIGIN = 0x280000, LENGTH = 0x020000
+}
+
 SECTIONS
 {
-  .text 0xc200: { 
-    *(.text) 
-  }
-  .data : { *(.data) }
+  . = 0x0000;
+  .text :
+  {
+    *(.text.main);
+    *(.text);
+  } > rom AT > ram
+
+  .rodata :
+  {
+    *(.rodata)
+  } > ram
+
+  .data : 
+  {
+    *(.data)
+  } > ram
+
+  .bss : 
+  {
+    *(.bss)
+  } > ram
 }
