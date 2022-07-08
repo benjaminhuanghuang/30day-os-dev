@@ -1,4 +1,4 @@
-#include <stdio.h>   // in the C compiler by the author
+#include "stdio.h"   // in the C compiler by the author
 
 extern void io_hlt(void);
 extern void io_cli(void);
@@ -46,9 +46,13 @@ int main(void)
 	
 	init_palette();
 	init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
-	putfonts8_asc(binfo->vram, binfo->scrnx, 30, 30, COL8_FFFFFF, "Haribote OS.");
+	// putfonts8_asc(binfo->vram, binfo->scrnx, 30, 30, COL8_FFFFFF, "Haribote OS.");
 
-	for (;;) {
+  char s[40];
+  sprintf(s, "scrnx = %d", binfo->scrnx);
+	putfonts8_asc(binfo->vram, binfo->scrnx, 16, 64, COL8_FFFFFF,s);
+  
+  for (;;) {
 		io_hlt();
 	}
 }

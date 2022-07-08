@@ -1,4 +1,5 @@
 # Day 5 - 1
+Refactor the makefile
 
 ## struct 
 haribo02b
@@ -47,5 +48,14 @@ use it in C
 ```
 
 
+## use sprintf 
+harib02g
+sprintf 只是将内容输出到内存中, 不依赖os
+```
+  #include <stdio.h>
 
+  char s[40];
+  sprintf(s, "scrnx = %d", binfo->scrnx);
+	putfonts8_asc(binfo->vram, binfo->scrnx, 16, 64, COL8_FFFFFF, s);	
+```
 

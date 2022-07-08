@@ -1,20 +1,28 @@
+ASM:= nasm
+ASFLAGS:= -f elf32
+
+CC:= gcc
+# CFLAGS += -Wall -Wno-format -Wno-unused
+CFLAGS+= -std=c11 -fno-stack-protector
+# CFLAGS+= -I./libc/include
+# CFLAGS += -ffunction-sections -fno-builtin -ffreestanding # -nostdinc -nostdlib 
+CFLAGS+= -fno-pie -m32 -c
+
+# Kernel Objects, the order matters!
+OBJS:= asmhead.o bootpack.o asmfunc.o font.o stdio.o
+
 ipl.bin: ipl.asm
-	nasm ipl.asm -o ipl.bin
+	$(ASM) ipl.asm -o ipl.bin
 
-asmhead.o: asmhead.asm 
-	nasm -f elf32 asmhead.asm -o asmhead.o -l asmhead.lst
+# Compile asmhead.asm and asmfunc.asm
+%.o: %.asm 
+	$(ASM) ${ASFLAGS} $< -o $@
 
-asmfunc.o: asmfunc.asm
-	nasm -f elf32 asmfunc.asm -o asmfunc.o -l asmfunc.lst
+%.o: %.c
+	$(CC) $(CFLAGS) $< -o $@
 
-bootpack.o: bootpack.c
-	gcc -m32 -fno-pie -o bootpack.o -c bootpack.c
-
-font.o: font.c
-	gcc -m32 -fno-pie -o font.o -c font.c
-
-kernel.bin: bootpack.o asmfunc.o asmhead.o hankaku.o
-	ld -m elf_i386 --oformat binary -T bootpack.ld  asmhead.o bootpack.o font.o asmfunc.o -o kernel.bin
+kernel.bin: ${OBJS}
+	ld -m elf_i386 --oformat binary -T bootpack.ld $^ -o $@
 
 img: ipl.bin kernel.bin
 	dd if=/dev/zero of=myos.img bs=512 count=2880
