@@ -31,3 +31,15 @@ static 指令用于数据，等效于DB指令, 避免被编译成赋值语句
 
 
 ## struct
+```
+struct BOOTINFO {
+	char cyls, leds, vmode, reserve;
+	short scrnx, scrny;
+	char *vram;
+};
+
+
+struct BOOTINFO *binfo = (struct BOOTINFO *) 0x0ff0; 
+xsize = (*binfo).scrnx;
+ysize = binfo->scrnx;
+```
