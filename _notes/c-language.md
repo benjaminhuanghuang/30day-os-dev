@@ -12,6 +12,12 @@
 ```
 
 ```
+int i
+
+for (int i = 0xa0000; i <= 0xaffff; i++) {
+  write_mem8(i, i & 0x0f); /* MOV BYTE [i],15 */
+}
+  
 _write_mem8: 	; void write_mem8(int addr, int dat);
 		MOV		ECX,[ESP+4]		; [ESP+4]存放的是地址
 		MOV		AL,[ESP+8]		; [ESP+8]存放的是数据
