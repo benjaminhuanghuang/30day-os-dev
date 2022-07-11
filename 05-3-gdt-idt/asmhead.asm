@@ -55,12 +55,17 @@ entry:
 
 
 ; 保护模式转换
+; Load GDT
 		LGDT	[GDTR0]			; 设置临时GDT
+
+; set CR0
 		MOV		EAX,CR0
 		AND		EAX,0x7fffffff	; 使用bit31（禁用分页）
-		OR		EAX,0x00000001	; bit0到1转换（保护模式过渡）
+		OR		EAX,0x00000001	; set PE 位 in CR0,bit0到1转换（保护模式过渡）
 		MOV		CR0,EAX
+ 
 		JMP		pipelineflush
+
 pipelineflush:
 		MOV		AX,1*8			;  写32bit的段
 		MOV		DS,AX
@@ -114,6 +119,8 @@ skip:
 		;JMP		DWORD 2*8:0x0000001b
     ; 此处做了修改
     MOV   ESP, 0xffff
+    ; jump to 32 code space   
+    ; 2*8 表示第2个段描述符在GDT中的偏移 Jump 到 bootpack的代码空间
     JMP   DWORD 2*8:0x00000000
 
 waitkbdout:
@@ -135,8 +142,7 @@ memcpy:
 
 		ALIGNB	16
 GDT0:
-		;RESB	8				; NULL selector
-    times 8 DB 0
+		times 8 DB 0 ; NULL selector, 8个字节都是0
 		DW		0xffff,0x0000,0x9200,0x00cf	; 写32bit位段寄存器
 		DW		0xffff,0x0000,0x9a28,0x0047	; 可执行的文件的32bit寄存器（bootpack用）
 
