@@ -1,7 +1,7 @@
 #include "bootpack.h"
 #include "stdio.h"
 
-void HariMain(void)
+int main(void)
 {
 	struct BOOTINFO *binfo = (struct BOOTINFO *) 0x0ff0;
 	char s[40], mcursor[256];
