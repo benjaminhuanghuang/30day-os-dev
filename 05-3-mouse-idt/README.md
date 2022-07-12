@@ -1,4 +1,9 @@
-# Day 5 - 3
+# Day 5 - 3 处理 Mouse 中断
+
+移动mouse需要处理中断
+https://gitee.com/paud/30daysOS/tree/master/projects/05_day/harib02i
+
+
 ## GDT(global（segment）descriptor table)与IDT(interrupt descriptor table)的初始化（harib02i）
 
 - GDT(global（segment）descriptor table)
@@ -30,6 +35,27 @@ IDT记录了0～255的中断号码与调用函数的对应关系
 
 如果段的设定还没顺利完成就设定IDT的话，会比较麻烦，所以必须先进行GDT的设定。
 
+
+```
+struct SEGMENT_DESCRIPTOR {
+	short limit_low, base_low;
+	char base_mid, access_right;
+	char limit_high, base_high;
+};
+
+struct GATE_DESCRIPTOR {
+	short offset_low, selector;
+	char dw_count, access_right;
+	short offset_high;
+};
+
+
+void init_gdtidt(void);
+void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, int ar);
+void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar);
+void load_gdtr(int limit, int addr);
+void load_idtr(int limit, int addr);
+```
 
 ## Move mouse (GDT Global Descriptor Table and IDT Interupt Descriptor Table)
 p101
