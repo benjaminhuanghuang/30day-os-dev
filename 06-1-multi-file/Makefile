@@ -1,91 +1,50 @@
 OBJS_BOOTPACK = bootpack.obj naskfunc.obj hankaku.obj graphic.obj dsctbl.obj
 
-TOOLPATH = ../z_tools/
-INCPATH  = ../z_tools/haribote/
+ASM:= nasm
+ASFLAGS:= -f elf32
 
-MAKE     = make
-NASK     = $(TOOLPATH)nask
-CC1      = $(TOOLPATH)gocc1 -I$(INCPATH) -Os -Wall -quiet
-GAS2NASK = $(TOOLPATH)gas2nask -a
-OBJ2BIM  = $(TOOLPATH)obj2bim
-BIM2HRB  = $(TOOLPATH)bim2hrb
-BIN2OBJ  = $(TOOLPATH)bin2obj
-RULEFILE = $(TOOLPATH)haribote/haribote.rul
-EDIMG    = $(TOOLPATH)edimg
-MAKEFONT = $(TOOLPATH)makefont
-IMGTOL   = $(TOOLPATH)imgtol.com
-DEL      = rm
+CC:= gcc
+# CFLAGS += -Wall -Wno-format -Wno-unused
+CFLAGS+= -std=c11 -fno-stack-protector
+# CFLAGS += -ffunction-sections -fno-builtin -ffreestanding -nostdinc -nostdlib 
+CFLAGS+= -fno-pie -m32 -c
 
-# Default action
+# Kernel Objects, the order matters!
+OBJS:= bootpack.o asmfunc.o font.o stdio.o graphic.o dsctbl.o
 
-default :
-	$(MAKE) img
+ipl.bin: ipl.asm
+	$(ASM) ipl.asm -o ipl.bin
 
-# File generation rules
-boot.bin : boot.nas Makefile
-	$(NASK) boot.nas boot.bin
+asmhead.bin: asmhead.asm
+	$(ASM) -f bin asmhead.asm -o asmhead.bin
 
-asmhead.bin : asmhead.nas Makefile
-	$(NASK) asmhead.nas asmhead.bin
+# Compile asmhead.asm and asmfunc.asm
+%.o: %.asm 
+	$(ASM) ${ASFLAGS} $< -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) $< -o $@
+
+kernel_c.bin: ${OBJS}
+	ld -m elf_i386 --oformat binary -T bootpack.ld $^ -o $@
+
+kernel.bin: kernel_c.bin asmhead.bin
+	cat asmhead.bin > kernel.bin
+	cat kernel_c.bin >> kernel.bin
+
+img: ipl.bin kernel.bin
+	dd if=/dev/zero of=myos.img bs=512 count=2880
+	dd if=ipl.bin of=myos.img bs=512 count=1 conv=notrunc
+	dd if=kernel.bin of=myos.img seek=33 bs=512 conv=notrunc
+
+run: img
+	qemu-system-i386 -fda myos.img -boot a
+
+debug: img
+	qemu-system-i386 -fda myos.img -boot a -s -S
+
+clean:
+	rm *.bin *.img *.o
 	
-hankaku.bin : hankaku.txt Makefile
-	$(MAKEFONT) hankaku.txt hankaku.bin
 
-hankaku.obj : hankaku.bin Makefile
-	$(BIN2OBJ) hankaku.bin hankaku.obj _hankaku
-
-bootpack.bim : $(OBJS_BOOTPACK) Makefile
-	$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map \
-		$(OBJS_BOOTPACK)
-# 3MB+64KB=3136KB
-
-bootpack.hrb : bootpack.bim Makefile
-	$(BIM2HRB) bootpack.bim bootpack.hrb 0
-
-haribote.sys : asmhead.bin bootpack.hrb Makefile
-	cat asmhead.bin bootpack.hrb > haribote.sys
-
-haribote.img : boot.bin haribote.sys Makefile
-	$(EDIMG)   imgin:../z_tools/fdimg0at.tek \
-		wbinimg src:boot.bin len:512 from:0 to:0 \
-		copy from:haribote.sys to:@: \
-		imgout:haribote.img
-
-# general rules
-%.gas : %.c Makefile
-	$(CC1) -o $*.gas $*.c
-
-%.nas : %.gas Makefile
-	$(GAS2NASK) $*.gas $*.nas
-
-%.obj : %.nas Makefile
-	$(NASK) $*.nas $*.obj $*.lst
-
-
-
-img :
-	$(MAKE) haribote.img
-
-run :
-	$(MAKE) img
-	qemu-system-i386 -fda haribote.img -boot a
-
-install :
-	$(MAKE) img
-	$(IMGTOL) w a: haribote.img
-
-clean :
-	-$(DEL) *.bin
-	-$(DEL) *.lst
-	-$(DEL) *.gas
-	-$(DEL) *.obj
-	-$(DEL) bootpack.nas
-	-$(DEL) bootpack.map
-	-$(DEL) bootpack.bim
-	-$(DEL) bootpack.hrb
-	-$(DEL) haribote.sys
-	-$(DEL) *.img
-	-$(DEL) *.o
-src_only :
-	$(MAKE) clean
-	-$(DEL) haribote.img
+	

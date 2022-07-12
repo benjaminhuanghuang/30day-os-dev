@@ -6,7 +6,7 @@ void init_gdtidt(void)
 	struct GATE_DESCRIPTOR    *idt = (struct GATE_DESCRIPTOR    *) 0x0026f800;
 	int i;
 
-	/* GDTの初期化 */
+	/* GDT Init*/
 	for (i = 0; i < 8192; i++) {
 		set_segmdesc(gdt + i, 0, 0, 0);
 	}
@@ -14,7 +14,7 @@ void init_gdtidt(void)
 	set_segmdesc(gdt + 2, 0x0007ffff, 0x00280000, 0x409a);
 	load_gdtr(0xffff, 0x00270000);
 
-	/* IDTの初期化 */
+	/* IDT Init */
 	for (i = 0; i < 256; i++) {
 		set_gatedesc(idt + i, 0, 0, 0);
 	}
