@@ -24,7 +24,7 @@ asmhead.bin: asmhead.asm
 	$(CC) $(CFLAGS) $< -o $@
 
 kernel_c.bin: ${OBJS}
-	ld -m elf_i386 --oformat binary -T bootpack.ld $^ -o $@
+	ld -m elf_i386 --oformat binary -T kernel.ld $^ -o $@
 
 kernel.bin: kernel_c.bin asmhead.bin
 	cat asmhead.bin > kernel.bin
