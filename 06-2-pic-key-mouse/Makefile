@@ -10,7 +10,7 @@ CFLAGS+= -std=c11 -fno-stack-protector
 CFLAGS+= -fno-pie -m32 -c
 
 # Kernel Objects, the order matters!
-OBJS:= bootpack.o asmfunc.o font.o stdio.o graphic.o dsctbl.o
+OBJS:= bootpack.o font.o stdio.o graphic.o dsctbl.o int.o asmfunc.o
 
 ipl.bin: ipl.asm
 	$(ASM) ipl.asm -o ipl.bin

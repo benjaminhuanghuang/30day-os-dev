@@ -5,7 +5,7 @@
   GLOBAL  io_load_eflags,  io_store_eflags
   GLOBAL	load_gdtr, load_idtr
   GLOBAL	asm_inthandler21, asm_inthandler27, asm_inthandler2c
-	EXTERN	inthandler21, inthandler27, inthandler2c
+	EXTERN	int_handler21, int_handler27, int_handler2c
   
   GLOBAL  write_mem8
    
@@ -102,7 +102,7 @@ asm_inthandler21:
 		MOV		AX,SS
 		MOV		DS,AX
 		MOV		ES,AX
-		CALL	_inthandler21
+		CALL	int_handler21
 		POP		EAX
 		POPAD
 		POP		DS
@@ -118,7 +118,7 @@ asm_inthandler27:
 		MOV		AX,SS
 		MOV		DS,AX
 		MOV		ES,AX
-		CALL	_inthandler27
+		CALL	int_handler27
 		POP		EAX
 		POPAD
 		POP		DS
@@ -134,7 +134,7 @@ asm_inthandler2c:
 		MOV		AX,SS
 		MOV		DS,AX
 		MOV		ES,AX
-		CALL	_inthandler2c
+		CALL	int_handler2c
 		POP		EAX
 		POPAD
 		POP		DS
