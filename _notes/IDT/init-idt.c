@@ -4,13 +4,9 @@ struct GATE_DESCRIPTOR {
 	short offset_high;
 };
 
-void init_idt(void);
-
-void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar);
-
 void init_idt(void)
 {
-	struct GATE_DESCRIPTOR    *idt = (struct GATE_DESCRIPTOR    *) 0x0026f800;
+	struct GATE_DESCRIPTOR *idt = (struct GATE_DESCRIPTOR *) 0x0026f800;
 	for (int i = 0; i < 256; i++) {
 		set_gatedesc(idt + i, 0, 0, 0);
 	}

@@ -5,8 +5,6 @@ struct SEGMENT_DESCRIPTOR {
 };
 
 
-void init_gdt(void);
-void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, int ar);
 #define ADR_IDT			0x0026f800
 #define LIMIT_IDT		0x000007ff
 #define ADR_GDT			0x00270000
