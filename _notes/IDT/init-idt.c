@@ -4,6 +4,10 @@ struct GATE_DESCRIPTOR {
 	short offset_high;
 };
 
+
+#define ADR_IDT			0x0026f800
+#define LIMIT_IDT		0x000007ff
+
 void init_idt(void)
 {
 	struct GATE_DESCRIPTOR *idt = (struct GATE_DESCRIPTOR *) 0x0026f800;

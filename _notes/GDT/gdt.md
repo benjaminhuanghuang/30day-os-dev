@@ -33,35 +33,6 @@ GDTR 有48位，不能用MOV指令来赋值。 给它赋值的时候，唯一的
 GDTR的低16位（即内存的最初2个字节）是段上限，它等于“GDT的有效字节数 -1”。 
 高32位（即剩余的4个字节），代表GDT的开始地址。
 
-
-## IDT(interrupt descriptor table)
-
-IDT记录了0～255的中断号码与调用函数的对应关系
-
-如果段的设定还没顺利完成就设定IDT的话，会比较麻烦，所以必须先进行GDT的设定。
-
-
-```
-struct SEGMENT_DESCRIPTOR {
-	short limit_low, base_low;
-	char base_mid, access_right;
-	char limit_high, base_high;
-};
-
-struct GATE_DESCRIPTOR {
-	short offset_low, selector;
-	char dw_count, access_right;
-	short offset_high;
-};
-
-
-void init_gdtidt(void);
-void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, int ar);
-void set_gatedesc(struct GATE_DESCRIPTOR *gd, int offset, int selector, int ar);
-void load_gdtr(int limit, int addr);
-void load_idtr(int limit, int addr);
-```
-
 ```
 ; 指定的段上限（limit）和地址值赋值给GDTR寄存器。
 ; GDTR 有 48位寄存器，不能用MOV指令来赋值。
@@ -69,9 +40,9 @@ void load_idtr(int limit, int addr);
 ; GDTR 低16位（即内存的最初2个字节）是段上限，它等于“GDT的有效字节数 -1”。
 ;      高32位（即剩余的4个字节），代表GDT的开始地址。
 _load_gdtr:		; void load_gdtr(int limit, int addr);
-   MOV		AX,[ESP+4]		; limit
-   MOV		[ESP+6],AX
-   LGDT	  [ESP+6]
+   MOV		AX,[ESP+4]		; 此时 limit在[ESP+4], addr在[ESP+8]
+   MOV		[ESP+6],AX    ; 把limit写入 [ESP+6]
+   LGDT	  [ESP+6]       ; 从[ESP+6] 正好可以连续读取 limit, addr 
    RET
 
 _load_idtr:		; void load_idtr(int limit, int addr);
@@ -80,3 +51,18 @@ _load_idtr:		; void load_idtr(int limit, int addr);
    LIDT	[ESP+6]
    RET
 ```
+
+12位段属性 ar 的高4位是扩展访问权限, 由 GD00构成
+G(granularity) =1 limit的单位为4KB, =0时limit的单位为1byte
+D =1 是32位模式, =0是 16位模式
+
+ar的低8位
+```
+  00000000 (0x00) 未使用
+  10010010 (0x92) 系统专用, 可读写, 不可执行
+  10011010 (0x9a) 系统专用, 可读不可写, 可执行
+  11110010 (0xf2) 程序用, 可读写, 不可执行
+  11111010 (0xfa) 程序用, 可读不可写, 可执行
+```
+CPU到底是处于系统模式还是应用模式，取决于执行中的应用程序是位于访问权为0x9a的段，还是位于访问权为0xfa的段。
+
