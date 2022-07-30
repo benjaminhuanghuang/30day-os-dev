@@ -33,9 +33,10 @@ void init_gdtidt(void)
 
 void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd, unsigned int limit, int base, int ar)
 {
+  // 段上限只有20位, 大于1M (2^20)时, 需要使用Gbit
 	if (limit > 0xfffff) {
 		ar |= 0x8000; /* G_bit = 1 */
-		limit /= 0x1000;
+		limit /= 0x1000;   // 4K = 2^12
 	}
 	sd->limit_low    = limit & 0xffff;
 	sd->base_low     = base & 0xffff;
