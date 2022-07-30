@@ -83,6 +83,21 @@ set_segmdesc(gdt + 2, LIMIT_BOTPAK, ADR_BOTPAK, AR_CODE32_ER);
 ```
 
 
+## 通知PIC继续检测中断
+```
+void inthandler21()
+  {
+    unsigned char data, s[4];
+    // 通知 PIC IRQ-01已经处理完毕， 将 0x60+IRQ号码 输出给OCW2就可以
+    // 通知PIC继续监视IRQ1中断是否发生。否则，PIC就不再监视IRQ1中断
+    io_out8(PICO_OCW2, 0x61);
+    // 从编号为0x0060的设备输入的8位信息是按键编码
+    data = io_in8(0x0060);
+
+    sprintf(s, "%02x", data)
+  }
+```
+
 ## 加快中断处理
 不要在中断处理期间, CPU不能接受别的中断, 因此不要在中断处理函数中进行耗时操作
 比如, 键盘中断处理函数只负责记录按键, 再由主循环处理按键, 而不是由中断处理函数处理按键
