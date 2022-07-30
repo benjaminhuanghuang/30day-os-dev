@@ -17,15 +17,19 @@ struct SEGMENT_DESCRIPTOR {
 
 void init_gdtidt(void)
 {
+  // 将 0x270000 ~ 0x27ffff设置为
 	struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) 0x00270000;
 
+  // 设置8192个段描述符, limit=0, base=0, privilege=0
 	for (int i = 0; i < 8192; i++) {
 		set_segmdesc(gdt + i, 0, 0, 0);
 	}
+  // #1段 limit=4G, base=0, privilege=4092
 	set_segmdesc(gdt + 1, 0xffffffff, 0x00000000, 0x4092);
+  // #2段 limit=512KB, base=0x280000, privilege=409a, for bootpack
 	set_segmdesc(gdt + 2, 0x0007ffff, 0x00280000, 0x409a);
-	load_gdtr(0xffff, 0x00270000);
-
+	
+  load_gdtr(0xffff, 0x00270000);  // limit, addr
 	return;
 }
 

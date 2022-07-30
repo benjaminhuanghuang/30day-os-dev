@@ -1,3 +1,7 @@
+/*
+  GDT, IDT descriptor table 
+*/
+
 #include "bootpack.h"
 
 void init_gdtidt(void)
