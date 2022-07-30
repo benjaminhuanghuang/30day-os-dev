@@ -1,6 +1,7 @@
 
 
-键盘对应的中断是IRQ1, 但是由于CPU内部会自动产生INT 0x00 ~ 0x0f, IRQ0 ~ IRQ15被映射到INT 0x20 ~ 0x2f
+键盘对应的中断是IRQ1, 
+但是由于CPU内部会自动产生INT 0x00 ~ 0x0f, IRQ0 ~ IRQ15被映射到INT 0x20 ~ 0x2f
 代码见 init_pic()
 
 因此键盘对应到中断为INT21
