@@ -1,5 +1,9 @@
-#include "bootpack.h"
-
+#include "fifo.h"
+#include "graphic.h"
+#include "int.h"
+#include "io.h"
+#include "keyboard.h"
+#include "mouse.h"
 
 void init_pic(void) {
   // 禁止所有中断
@@ -19,9 +23,7 @@ void init_pic(void) {
   io_out8(PIC0_IMR, 0xfb); // PIC1以外中断全部禁止
   io_out8(PIC1_IMR, 0xff); // 禁止全部中断
 }
-#define PORT_KEYDAT		0x0060
 
-struct FIFO8 keyfifo;
 
 void int_handler21(int *esp) {
   unsigned char data;
@@ -30,8 +32,6 @@ void int_handler21(int *esp) {
 	fifo8_put(&keyfifo, data);
 	return;
 }
-
-struct FIFO8 mousefifo;
 
 void int_handler2c(int *esp) {
   unsigned char data;
