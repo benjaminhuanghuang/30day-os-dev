@@ -45,36 +45,6 @@
 
 ```
 
-## Files
-ipl10.nas    : initial program load
-
-asmhead.nas  : 
-
-naskfunc.nas :
-
-bootpack.c   :
-
-bootpack.h   : 函数，变量声明 
-
-graphic.h    : 调色板，字体，draw text, draw mouse cursor
-
-dsctbl.c     : idt, gdt 初始化
-
-int.c        : 中断处理, 键盘，鼠标 
-
-fifo.c       : FIFO buffer, 接收鼠标，键盘数据
-
-hankaku.txt  : Font
-
-keyboard.c   : 中断处理函数，keyboard setup
-
-mouse.c      : 中断处理函数，mouse setup
-
-memory.c     : memory
-
-sheet.c      : 
-
-
 ## OS Memory Layout
 Day5 P105 P106 
 GDT 被设定为 0x270000 ~ 0x27FFFF
@@ -90,5 +60,5 @@ IDT 被设定为 0x26F800 ~ 0x26FFFF
 bootpack.harb 是以ORG 0位前提编译的, asmhead.s 会把bootpack.harb 加载到 0x280000~0x2fffff
 
 
-
-
+## Kernel 加载
+ORG   0xc200            ; 程序被加载的内存地址  

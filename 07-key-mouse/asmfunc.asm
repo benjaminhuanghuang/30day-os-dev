@@ -1,6 +1,6 @@
 [BITS 32]						; 
   GLOBAL	load_gdtr, load_idtr
-  GLOBAL	asm_inthandler21, asm_inthandler27, asm_inthandler2c
+  GLOBAL	asm_int_handler21, asm_int_handler27, asm_int_handler2c
 	EXTERN	int_handler21, int_handler27, int_handler2c
 
    
@@ -17,7 +17,7 @@ load_idtr:		; void load_idtr(int limit, int addr);
    LIDT	[ESP+6]
    RET
 
-asm_inthandler21:
+asm_int_handler21:
 		PUSH	ES
 		PUSH	DS
 		PUSHAD
@@ -33,7 +33,7 @@ asm_inthandler21:
 		POP		ES
 		IRETD
 
-asm_inthandler27:
+asm_int_handler27:
 		PUSH	ES
 		PUSH	DS
 		PUSHAD
@@ -49,7 +49,7 @@ asm_inthandler27:
 		POP		ES
 		IRETD
 
-asm_inthandler2c:
+asm_int_handler2c:
 		PUSH	ES
 		PUSH	DS
 		PUSHAD

@@ -12,7 +12,7 @@
 int main(void)
 {
   struct BOOTINFO *binfo = (struct BOOTINFO *)0x0ff0;
-  char s[40], mcursor[256], keybuf[32], mousebuf[128];
+  char s[40], mcursor[256];
   int mx, my, i;
 
   init_gdtidt();
@@ -37,7 +37,7 @@ int main(void)
   putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
 
   enable_mouse();
-
+  
   for (;;)
   {
     io_cli();

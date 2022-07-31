@@ -61,6 +61,7 @@ entry:
 		OR		EAX,0x00000001	; bit0到1转换（保护模式过渡）
 		MOV		CR0,EAX
 		JMP		pipelineflush
+
 pipelineflush:
 		MOV		AX,1*8			;  写32bit的段
 		MOV		DS,AX
@@ -109,6 +110,7 @@ pipelineflush:
 		;ADD		ESI,EBX
 		;MOV		EDI,[EBX+12]	; 目标
 		;CALL	memcpy
+
 skip:
 		;MOV		ESP,[EBX+12]	; 堆栈的初始化
 		;JMP		DWORD 2*8:0x0000001b
