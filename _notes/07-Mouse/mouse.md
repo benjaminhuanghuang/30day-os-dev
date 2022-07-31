@@ -1,10 +1,14 @@
+
 鼠标的中断号码是IRQ12
 
-所以，当鼠标刚刚作为计算机的一个外部设备开始使用的时候，几乎所有的操作系统都不支持它。
-因此主板上做了鼠标用的电路，但缺省被disabled。
-必须发行指令，让 是鼠标控制电路和鼠标本身 有效
+当鼠标刚刚作为计算机的一个外部设备开始使用的时候，几乎所有的操作系统都不支持它。
+因此主板上的鼠标控制电路缺省被disabled。 必须发行指令激活鼠标控制电路和鼠标本身
 
-这些信息见 http://cummitity.osdev.info
+见 http://cummitity.osdev.info
+
+
+鼠标控制电路包含在键盘控制电路里
+
 
 ```
 #define PORT_KEYDAT				0x0060
@@ -16,7 +20,7 @@
 
 void wait_KBC_sendready(void)
 {
-	/* Wating for keyboard controller*/
+	/* Wating for keyboard controller, 控制电路比较慢*/
 	for (;;) {
 		// CPU从设备号码0x0064处所读取的数据的倒数第二位
 		if ((io_in8(PORT_KEYSTA) & KEYSTA_SEND_NOTREADY) == 0) {

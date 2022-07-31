@@ -1,4 +1,4 @@
-# day 7 6 FIFO与鼠标控制
+# day 7 FIFO 与鼠标控制
 
 - https://gitee.com/paud/30daysOS/tree/master/projects/07_day/harib04a
 
@@ -38,4 +38,13 @@ struct FIFO8 {
   int p, q, size, free, flags;
 };
 ```
+
+- https://gitee.com/paud/30daysOS/tree/master/projects/07_day/harib04f
+激活鼠标
+
+- https://gitee.com/paud/30daysOS/tree/master/projects/07_day/harib04g
+读写mousefifo
+
+
+
 
