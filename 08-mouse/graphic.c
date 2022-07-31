@@ -1,4 +1,5 @@
-#include "bootpack.h"
+#include "graphic.h"
+#include "io.h"
 
 void init_palette(void)
 {
@@ -29,8 +30,8 @@ void init_palette(void)
 void set_palette(int start, int end, unsigned char *rgb)
 {
 	int i, eflags;
-	eflags = io_load_eflags();	/* 割り込み許可フラグの値を記録する */
-	io_cli(); 					/* 許可フラグを0にして割り込み禁止にする */
+	eflags = io_load_eflags();	// 记录标志
+	io_cli(); 					// 禁止中断
 	io_out8(0x03c8, start);
 	for (i = start; i <= end; i++) {
 		io_out8(0x03c9, rgb[0] / 4);
@@ -52,7 +53,7 @@ void boxfill8(unsigned char *vram, int xsize, unsigned char c, int x0, int y0, i
 	return;
 }
 
-void init_screen8(char *vram, int x, int y)
+void init_screen8(unsigned char *vram, int x, int y)
 {
 	boxfill8(vram, x, COL8_008484,  0,     0,      x -  1, y - 29);
 	boxfill8(vram, x, COL8_C6C6C6,  0,     y - 28, x -  1, y - 28);
@@ -73,7 +74,7 @@ void init_screen8(char *vram, int x, int y)
 	return;
 }
 
-void putfont8(char *vram, int xsize, int x, int y, char c, char *font)
+void putfont8(unsigned char *vram, int xsize, int x, int y, char c, char *font)
 {
 	int i;
 	char *p, d /* data */;
@@ -92,7 +93,7 @@ void putfont8(char *vram, int xsize, int x, int y, char c, char *font)
 	return;
 }
 
-void putfonts8_asc(char *vram, int xsize, int x, int y, char c, unsigned char *s)
+void putfonts8_asc(unsigned char *vram, int xsize, int x, int y, char c, unsigned char *s)
 {
 	extern char hankaku[4096];
 	for (; *s != 0x00; s++) {
@@ -141,7 +142,7 @@ void init_mouse_cursor8(char *mouse, char bc)
 	return;
 }
 
-void putblock8_8(char *vram, int vxsize, int pxsize,
+void putblock8_8(unsigned char *vram, int vxsize, int pxsize,
 	int pysize, int px0, int py0, char *buf, int bxsize)
 {
 	int x, y;
