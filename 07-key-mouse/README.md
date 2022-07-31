@@ -1,4 +1,4 @@
-# day 7 FIFO 与鼠标控制
+# Day 7 FIFO 与鼠标控制
 
 - https://gitee.com/paud/30daysOS/tree/master/projects/07_day/harib04a
 
@@ -6,7 +6,6 @@
 
 - https://gitee.com/paud/30daysOS/tree/master/projects/07_day/harib04b
 在inthandler21 写 buffer， 在主程序中 读 buffer, 每次只能接受一个字节
-
 
 
 - https://gitee.com/paud/30daysOS/tree/master/projects/07_day/harib04c
@@ -44,7 +43,7 @@ struct FIFO8 {
 
 - https://gitee.com/paud/30daysOS/tree/master/projects/07_day/harib04g
 读写mousefifo
-
+int.c
 
 
 
