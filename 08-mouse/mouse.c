@@ -13,6 +13,7 @@ void enable_mouse(struct MouseDec *mdec) {
   io_out8(PORT_KEYDAT, MOUSECMD_ENABLE);
 
   mdec->phase = 0;
+  return;
 }
 
 int mouse_decode(struct MouseDec *mdec, unsigned char dat) {
