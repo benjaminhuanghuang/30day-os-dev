@@ -10,6 +10,10 @@ unsigned int memman_alloc_4k(struct MemMan *man, unsigned int size) {
   return memman_alloc(man, size);
 }
 ```
+## 图层叠加
+- https://gitee.com/paud/30daysOS/tree/master/projects/10_day/harib07b
 
+## 图层叠加优化
+- https://gitee.com/paud/30daysOS/tree/master/projects/10_day/harib07c
 
 
