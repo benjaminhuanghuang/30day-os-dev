@@ -1,12 +1,14 @@
 # Day 9 Memory
 
+## refactor
+
+拆分文件 mouse.c, keyboard.c, 修改Makefile
 - https://gitee.com/paud/30daysOS/tree/master/projects/09_day/harib06a
 
-refactor, 拆分文件 mouse.c, keyboard.c, 修改Makefile
 
 
+## 检查内存容量
 - https://gitee.com/paud/30daysOS/tree/master/projects/09_day/harib06b
-检查内存容量
 
 方法1: 在启动时，通过BIOS检查内存容量. 但那样做的话，一方面asmhead.nas会变长，另一方面，BIOS版本不同，BIOS函数的调用方法也不相同
 
@@ -20,12 +22,32 @@ refactor, 拆分文件 mouse.c, keyboard.c, 修改Makefile
 ```
 qemu-system-i386 -fda myos.img -boot a -m 32
 ```
+## 用汇编改写 memtest
 - https://gitee.com/paud/30daysOS/tree/master/projects/09_day/harib06c
-作者用汇编改写 memtest, 但在我的环境里运行正常
+作者, 但在我的环境里运行正常
 
+0x400000以前的内存已经被用了(见8.5内存分布图), 
+![](./os-mem-layout.png)
 
+因此检测0x00400000 ~ 0xbfffffff 的3G空间
+```
+ unsigned int memtotal = memtest(0x00400000, 0xbfffffff);
+```
+## 内存管理
 - https://gitee.com/paud/30daysOS/tree/master/projects/09_day/harib06d
-内存管理
+
+```
+struct FreeInfo {
+  unsigned int addr, size;
+};
+
+struct MemMan {
+  int frees, maxfrees, lostsize, losts;
+  struct FreeInfo free[MEMMAN_FREES];
+};
+```
+memman 需要32K
+使用0x3c0000开始
 
 
 

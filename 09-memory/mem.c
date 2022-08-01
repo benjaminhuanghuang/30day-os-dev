@@ -138,6 +138,7 @@ int memman_free(struct MemMan *man, unsigned int addr, unsigned int size)
 {
   int i, j;
 
+  // 先决定该放在哪里
   for (i = 0; i < man->frees; i++)
   {
     if (man->free[i].addr > addr)

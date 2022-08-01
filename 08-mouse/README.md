@@ -1,5 +1,6 @@
 # Day 8 鼠标控制与32位模式切换
 
+## 读M ouse 数据
 - https://gitee.com/paud/30daysOS/tree/master/projects/08_day/harib05a
 
 首先要把最初读到的 0xfa舍弃掉。之后，每次从鼠标那里送过来的数据都应该是3个字节一组的，所以每当数据累积到
@@ -26,18 +27,18 @@ struct MouseDec {
 };
 ```
 
-
+## mouse data decode
 - https://gitee.com/paud/30daysOS/tree/master/projects/08_day/harib05c
 
-mouse_decode
+
 ``` 
   mdec->btn = mdec->buf[0] & 0x07;      // 低 3 位
   mdec->x = mdec->buf[1];
   mdec->y = mdec->buf[2];
 ```
 
+## move mouse
 - https://gitee.com/paud/30daysOS/tree/master/projects/08_day/harib05d
-move mouse
 
 ```
 
