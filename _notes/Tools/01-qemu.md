@@ -65,3 +65,9 @@ qemu-system-i386 -hda xxx.img 运行xxx.img中的系统
   
   qemu-img info myos.img
 ```
+
+
+指定虚拟机可用内存 -m
+```
+qemu-system-i386 -fda myos.img -boot a -m 32
+```

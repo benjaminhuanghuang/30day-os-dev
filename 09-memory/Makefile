@@ -38,7 +38,7 @@ img: ipl.bin kernel.bin
 	dd if=kernel.bin of=myos.img seek=33 bs=512 conv=notrunc
 
 run: img
-	qemu-system-i386 -fda myos.img -boot a
+	qemu-system-i386 -fda myos.img -boot a -m 32
 
 debug: img
 	qemu-system-i386 -fda myos.img -boot a -s -S
