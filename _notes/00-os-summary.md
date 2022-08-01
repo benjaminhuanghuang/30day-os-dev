@@ -1,3 +1,18 @@
+ipl.asm 会被加载到0x7c00处
+
+
+Fat格式的磁盘上第一个文件的起始位置在 512 * 33 = 0x4200
+
+因为loader会把disk上从C0-H0-S2开始到C0-H0-S18的内容加载到0x8200，
+
+所以kernel(磁盘上唯一的文件,位于磁盘0x4200)会被加载到内存(0x8200-0x200)+0x4200 = 0xc200的位置。
+
+因此kernel.asm中 org 应为 0xc2000， loader中最后要jmp到0xc2000 开始执行
+
+
+
+
+
 ##
 ```
 ; haribote os(haribote.sys)

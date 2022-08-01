@@ -57,8 +57,8 @@ entry:
 ; 保护模式转换
 		LGDT	[GDTR0]			; 设置临时GDT
 		MOV		EAX,CR0
-		AND		EAX,0x7fffffff	; 使用bit31（禁用分页）
-		OR		EAX,0x00000001	; bit0到1转换（保护模式过渡）
+		AND		EAX,0x7fffffff	; 设置 bit31 为 0（禁用分页）
+		OR		EAX,0x00000001	; 设置 bit0  为 1（保护模式过渡）
 		MOV		CR0,EAX
 		JMP		pipelineflush
 
@@ -91,9 +91,9 @@ pipelineflush:
 		MOV		ESI,DSKCAC0+512	; 源 DSKCAC0=0x8000
 		MOV		EDI,DSKCAC+512	; 目标 0x100200
 		MOV		ECX,0
-		MOV		CL,BYTE [CYLS]
-		IMUL	ECX,512*18*2/4	; 除以4得到字节数
-		SUB		ECX,512/4		    ; IPL偏移量
+		MOV		CL,BYTE [CYLS]  ; ECX = 柱面数 
+		IMUL	ECX,512*18*2/4	; 柱面数转换成字节数/4
+		SUB		ECX,512/4		    ; 减去启动扇区的512字节/4
 		CALL	memcpy
 
 ; 由于还需要asmhead才能完成
@@ -136,6 +136,8 @@ memcpy:
 ; memcpy地址前缀大小
 
 		ALIGNB	16
+
+; 临时GDT    
 GDT0:
 		;RESB	8				; NULL selector
     times 8 DB 0
@@ -143,6 +145,8 @@ GDT0:
 		DW		0xffff,0x0000,0x9a28,0x0047	; 可执行的文件的32bit寄存器（bootpack用）
 
 		DW		0
+
+; 临时GDT的上限和地址,用于 LGDT 加载
 GDTR0:
 		DW		8*3-1
 		DD		GDT0
