@@ -19,6 +19,9 @@ unsigned int memtest_sub(unsigned int start, unsigned int end);
 void memman_init(struct MemMan *man);
 unsigned int memman_total(struct MemMan *man);
 unsigned int memman_alloc(struct MemMan *man, unsigned int size);
+unsigned int memman_alloc_4k(struct MemMan *man, unsigned int size);
+
 int memman_free(struct MemMan *man, unsigned int addr, unsigned int size);
+int memman_free_4k(struct MemMan *man, unsigned int addr, unsigned int size);
 
 #endif // _MEM_H_

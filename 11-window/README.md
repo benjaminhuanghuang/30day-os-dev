@@ -12,7 +12,11 @@ if (my > binfo->scrny - 1) {
 }
 ```
 
-# fix sheet_refreshsub
+## fix sheet_refreshsub
 - https://gitee.com/paud/30daysOS/tree/master/projects/11_day/harib08a
 
 不刷新画面以外的部分
+
+
+## 从sheet 相关的函数中移除*ctl
+把ctlt移到 struct SHTCTL
