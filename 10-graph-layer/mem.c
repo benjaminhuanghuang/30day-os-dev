@@ -132,6 +132,7 @@ unsigned int memman_alloc(struct MemMan *man, unsigned int size)
 }
 
 unsigned int memman_alloc_4k(struct MemMan *man, unsigned int size) {
+  // 向上取整
   size = (size + 0xfff) & 0xfffff000;
   return memman_alloc(man, size);
 }
